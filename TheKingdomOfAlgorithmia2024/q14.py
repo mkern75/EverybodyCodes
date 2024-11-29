@@ -1,8 +1,6 @@
 from time import time
-from collections import defaultdict
-from heapq import heappop, heappush
 
-INF = 1 << 31
+DIR = {"R": (1, 0, 0), "L": (-1, 0, 0), "U": (0, 1, 0), "D": (0, -1, 0), "F": (0, 0, 1), "B": (0, 0, -1)}
 
 
 def grow_branch(steps):
@@ -10,42 +8,23 @@ def grow_branch(steps):
     x, y, z = 0, 0, 0
     for step in steps:
         d, v = step[0], int(step[1:])
-        dx, dy, dz = 0, 0, 0
-        if d == "U":
-            dy = 1
-        elif d == "D":
-            dy = -1
-        elif d == "R":
-            dx = 1
-        elif d == "L":
-            dx = -1
-        elif d == "F":
-            dz = 1
-        elif d == "B":
-            dz = -1
+        dx, dy, dz = DIR[d]
         for i in range(v):
-            x += dx
-            y += dy
-            z += dz
+            x, y, z = x + dx, y + dy, z + dz
             branch.add((x, y, z))
     return branch, (x, y, z)
 
 
-def dijsktra(plant, start):
+def bfs_dist(plant, start):
     xs, ys, zs = start
-    dist = defaultdict(lambda: INF)
-    dist[xs, ys, zs] = 0
-    q = [(0, xs, ys, zs)]
-    while q:
-        d, x, y, z = heappop(q)
-        if d > dist[x, y, z]:
-            continue
-        for xn, yn, zn, in [(x + 1, y, z), (x - 1, y, z), (x, y + 1, z), (x, y - 1, z), (x, y, z + 1), (x, y, z - 1)]:
-            if (xn, yn, zn) in plant:
-                dn = d + 1
-                if dn < dist[xn, yn, zn]:
-                    dist[xn, yn, zn] = dn
-                    heappush(q, (dn, xn, yn, zn))
+    dist = {(xs, ys, zs): 0}
+    q = [(xs, ys, zs)]
+    for x, y, z in q:
+        for dx, dy, dz in DIR.values():
+            xn, yn, zn = x + dx, y + dy, z + dz
+            if (xn, yn, zn) in plant and (xn, yn, zn) not in dist:
+                dist[xn, yn, zn] = dist[x, y, z] + 1
+                q += [(xn, yn, zn)]
     return dist
 
 
@@ -88,7 +67,7 @@ for steps in steps_all:
     leaves.add(leaf)
 trunk = [(x, y, z) for x, y, z in plant if x == z == 0]
 
-dist = [dijsktra(plant, leaf) for leaf in leaves]  # there are fewer leaves that segments in the trunk
+dist = [bfs_dist(plant, leaf) for leaf in leaves]  # there are fewer leaves that segments in the trunk
 ans3 = min(sum(dist[i][t] for i in range(len(leaves))) for t in trunk)
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
