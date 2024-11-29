@@ -88,9 +88,7 @@ for steps in steps_all:
     leaves.add(leaf)
 trunk = [(x, y, z) for x, y, z in plant if x == z == 0]
 
-ans3 = INF
-for start in trunk:
-    dist = dijsktra(plant, start)
-    ans3 = min(ans3, sum(dist[leaf] for leaf in leaves))
+dist = [dijsktra(plant, leaf) for leaf in leaves]  # there are fewer leaves that segments in the trunk
+ans3 = min(sum(dist[i][t] for i in range(len(leaves))) for t in trunk)
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
