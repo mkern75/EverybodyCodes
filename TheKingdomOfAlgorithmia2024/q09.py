@@ -1,4 +1,7 @@
+from time import time
+
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q09_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -14,9 +17,10 @@ for i in range(1, mx + 1):
             dp[i] = min(dp[i], dp[i - x] + 1)
 
 ans1 = sum(dp[i] for i in nums)
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q09_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 nums = [int(x) for x in data]
@@ -31,9 +35,10 @@ for i in range(1, mx + 1):
             dp[i] = min(dp[i], dp[i - x] + 1)
 
 ans2 = sum(dp[i] for i in nums)
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q09_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -58,5 +63,5 @@ for i in nums:
             best = min(best, dp[lo] + dp[hi])
     ans3 += best
 
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

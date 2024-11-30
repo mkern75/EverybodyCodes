@@ -1,4 +1,7 @@
+from time import time
+
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q08_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -11,9 +14,10 @@ while remaining > 0:
     remaining -= 2 * h - 1
 
 ans1 = w * abs(remaining)
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q08_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -29,9 +33,10 @@ while remaining > 0:
     remaining -= w * t
 
 ans2 = w * abs(remaining)
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q08_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 ans3 = 0
@@ -56,5 +61,5 @@ while remaining > 0:
     remaining += (2 * w * col[0]) % mod
 
 ans3 = abs(remaining)
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

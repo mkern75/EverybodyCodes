@@ -1,4 +1,6 @@
+from time import time
 from itertools import combinations
+from math import lcm
 
 
 def load_notes(data):
@@ -30,25 +32,44 @@ def load_track(data):
     return track[1:] + track[0:1]
 
 
-def loop(n, notes, track):
-    total, power_level, i = 0, 10, 0
-    for _ in range(n):
-        for c in track:
-            if c == "+":
+def loop_helper(n_steps, note, track, power_level_initial):
+    total = 0
+    power_level = power_level_initial
+    for i in range(n_steps):
+        c = track[i % len(track)]
+        if c == "+":
+            power_level += 1
+        elif c == "-":
+            power_level -= 1
+        else:
+            if note[i % len(note)] == "+":
                 power_level += 1
-            elif c == "-":
+            elif note[i % len(note)] == "-":
                 power_level -= 1
-            else:
-                if notes[i % len(notes)] == "+":
-                    power_level += 1
-                elif notes[i % len(notes)] == "-":
-                    power_level -= 1
-            total += power_level
-            i += 1
+        total += power_level
+    return total, power_level
+
+
+def loop(n_loops, note, track):
+    k = lcm(len(note), len(track))
+
+    power_level_initial = 10
+    total, power_level = loop_helper(k, note, track, power_level_initial)
+    power_level_delta = power_level - power_level_initial
+    total_delta = total - k * power_level_initial
+
+    total, power_level = 0, 10
+    q, r = divmod(n_loops, k // len(track))
+    for _ in range(q):
+        total += power_level * k + total_delta
+        power_level += power_level_delta
+    total += loop_helper(r * len(track), note, track, power_level)[0]
+
     return total
 
 
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q07_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -65,13 +86,13 @@ for note in notes:
             power_level = max(0, power_level - 1)
         total += power_level
     essence += [total]
-
 idx = sorted(range(len(devices)), key=lambda i: -essence[i])
-
 ans1 = "".join(devices[i] for i in idx)
-print(f"part 1: {ans1}")
+
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q07_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 INPUT_FILE2 = "./TheKingdomOfAlgorithmia2024/data/q07_p2_track.txt"
@@ -85,13 +106,13 @@ track = load_track(data2)
 essence = []
 for i in range(n):
     essence += [loop(10, notes[i], track)]
-
 idx = sorted(range(len(devices)), key=lambda i: -essence[i])
-
 ans2 = "".join(devices[i] for i in idx)
-print(f"part 2: {ans2}")
+
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q07_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 INPUT_FILE2 = "./TheKingdomOfAlgorithmia2024/data/q07_p3_track.txt"
@@ -112,5 +133,5 @@ for c1 in combinations(range(11), 6):
             note[c] = "="
         if loop(2024, note, track) > essence_to_beat:
             ans3 += 1
-print(f"part 3: {ans3}")
 
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")

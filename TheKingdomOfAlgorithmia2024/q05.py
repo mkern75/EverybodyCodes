@@ -1,3 +1,4 @@
+from time import time
 from collections import Counter
 
 
@@ -24,6 +25,7 @@ def get_number(col):
 
 
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q05_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 ans1 = 0
@@ -35,9 +37,10 @@ for rnd in range(1, 10 + 1):
     insert_into_column(v, col[rnd % 4])
 
 ans1 = get_number(col)
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q05_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 ans2 = 0
@@ -56,9 +59,10 @@ while True:
         break
     rnd += 1
 
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q05_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 ans3 = 0
@@ -80,5 +84,5 @@ while True:
 
     rnd += 1
 
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

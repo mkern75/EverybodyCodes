@@ -1,3 +1,5 @@
+from time import time
+
 def runic_word(grid):
     res = []
     for r in range(2, 6):
@@ -78,13 +80,15 @@ def power(word):
 
 
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q10_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 ans1 = runic_word(data)
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q10_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 ans2 = 0
@@ -99,9 +103,10 @@ for i in range(7):
                 g[r][c] = data[rb + r][cb + c]
         ans2 += power(runic_word(g))
 
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q10_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -133,5 +138,5 @@ for i in range(n):
                 w.extend(grid[rb + r][cb + 2:cb + 6])
             ans3 += power("".join(w))
 
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

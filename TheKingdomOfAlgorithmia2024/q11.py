@@ -1,3 +1,5 @@
+from time import time
+
 def multiply(matrix, vector):
     n = len(vector)
     result_vector = [0] * n
@@ -8,6 +10,7 @@ def multiply(matrix, vector):
 
 
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q11_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -32,9 +35,10 @@ for _ in range(4):
     cnt = multiply(mult, cnt)
 
 ans1 = sum(cnt)
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q11_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -59,9 +63,10 @@ for _ in range(10):
     cnt = multiply(mult, cnt)
 
 ans2 = sum(cnt)
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q11_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -91,5 +96,5 @@ for start in cat:
     mx = max(mx, res)
 
 ans3 = mx - mn
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

@@ -1,4 +1,7 @@
+from time import time
+
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q02_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -10,9 +13,10 @@ for i in range(len(message)):
         if message[i:].startswith(word):
             ans1 += 1
 
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q02_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -32,9 +36,10 @@ for line in data[2:]:
         cnt = cnt[::-1]
     ans2 += sum(cnt)
 
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q02_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -63,5 +68,5 @@ for r in range(n):
                         cnt[r - i][c] = 1
 
 ans3 = sum(sum(row) for row in cnt)
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
 

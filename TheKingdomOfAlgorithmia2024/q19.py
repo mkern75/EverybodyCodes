@@ -1,7 +1,7 @@
 from time import time
 
 N8 = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
-SHOW_GRID = True
+SHOW_GRID = False
 
 
 def ff(r, c, m):

@@ -1,13 +1,17 @@
+from time import time
+
 # ********************************* part 1
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q01_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 s = data[0]
 
 ans1 = s.count("B") + 3 * s.count("C")
 
-print(f"part 1: {ans1}")
+print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q01_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 s = data[0]
@@ -28,9 +32,10 @@ for i in range(0, len(s), 2):
         elif x == "x":
             ans2 -= 1
 
-print(f"part 2: {ans2}")
+print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
+time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q01_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 s = data[0]
@@ -52,4 +57,4 @@ for i in range(0, len(s), 3):
     elif cnt_x == 1:
         ans3 -= 2
 
-print(f"part 3: {ans3}")
+print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
