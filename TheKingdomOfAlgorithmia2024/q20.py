@@ -94,7 +94,6 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 grid = data
 n, m = len(data), len(data[0])
-rs, cs = 0, next(c for c, v in enumerate(grid[0]) if v == "S")
 
 ans3 = 0
 alt = 384_400
