@@ -5,8 +5,12 @@ def load_locations(data):
     loc = {"T": []}
     for r, row in enumerate(data):
         for c, x in enumerate(row):
-            if x in "ABC":
-                loc[x] = (r, c)
+            if x == "A":
+                loc["A"] = (r, c, 1)
+            elif x == "B":
+                loc["B"] = (r, c, 2)
+            elif x == "C":
+                loc["C"] = (r, c, 3)
             elif x == "T":
                 loc["T"] += [(r, c, 1)]
             elif x == "H":
@@ -16,43 +20,50 @@ def load_locations(data):
 
 def hit_targets(loc):
     res = 0
-    ra, ca = loc["A"]
-    rb, cb = loc["B"]
-    rc, cc = loc["C"]
-    for rt, ct, ft in loc["T"]:
-        delta_a = ct - ca - (rt - ra)
-        delta_b = ct - cb - (rt - rb)
-        delta_c = ct - cc - (rt - rc)
-        if delta_a % 3 == 0:
-            res += ft * 1 * delta_a // 3
-        elif delta_b % 3 == 0:
-            res += ft * 2 * delta_b // 3
-        elif delta_c % 3 == 0:
-            res += ft * 3 * delta_c // 3
+    for rs, cs, ms in [loc["A"], loc["B"], loc["C"]]:
+        for rt, ct, mt in loc["T"]:
+            delta = ct - cs - (rt - rs)
+            if delta % 3 == 0:
+                res += ms * mt * delta // 3
     return res
 
 
-def simulate(r, c, f, power, delay, pos_meteor):
-    t = delay
-    for _ in range(power):
-        t, r, c = t + 1, r + 1, c + 1
-        if t >= len(pos_meteor) or r > pos_meteor[t][0] or c > pos_meteor[t][1]:
-            return []
-        if pos_meteor[t] == (r, c):
-            return [(t, r, c, power, f)]
-    for _ in range(power):
-        t, r, c = t + 1, r, c + 1
-        if t >= len(pos_meteor) or r > pos_meteor[t][0] or c > pos_meteor[t][1]:
-            return []
-        if pos_meteor[t] == (r, c):
-            return [(t, r, c, power, f)]
-    for _ in range(power + 2):
-        t, r, c = t + 1, r - 1, c + 1
-        if t >= len(pos_meteor) or r > pos_meteor[t][0] or c > pos_meteor[t][1]:
-            return []
-        if pos_meteor[t] == (r, c):
-            return [(t, r, c, power, f)]
-    return []
+def calc_hit(rt, ct, rs, cs, ms):
+    t_delay = 0
+    if (ct - cs) & 1:
+        t_delay = 1
+        rt -= 1
+        ct -= 1
+
+    delta = ct - cs
+    # details of hit if possible
+    t_hit = delta // 2
+    r_hit = rt - delta // 2
+    c_hit = ct - delta // 2
+    dr = r_hit - rs
+    dc = c_hit - cs
+
+    if r_hit < 0:
+        return None
+    if dc < dr:
+        return None
+
+    # hit in phase 1
+    p_hit = dr
+    if dr == dc:
+        return t_delay + t_hit, r_hit, c_hit, p_hit, ms
+
+    # hit in phase 2
+    p_hit = dr
+    if p_hit < dc <= 2 * p_hit:
+        return t_delay + t_hit, r_hit, c_hit, p_hit, ms
+
+    # hit in phase 3
+    p_hit, r = divmod(dr + t_hit, 3)
+    if r == 0:
+        return t_delay + t_hit, r_hit, c_hit, p_hit, ms
+
+    return None
 
 
 # ********************************* part 1
@@ -79,34 +90,19 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 time_start = time()
 INPUT_FILE = "./TheKingdomOfAlgorithmia2024/data/q12_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
-ans3 = 0
 
-ra, ca = 0, 0
-rb, cb = 1, 0
-rc, cc = 2, 0
+segments = [(0, 0, 1), (1, 0, 2), (2, 0, 3)]
 targets = [tuple(map(int, line.split()))[::-1] for line in data]
 
-for i, (rt, ct) in enumerate(targets):
-
-    if i % 100 == 0:
-        print(f"    {str(i).ljust(4, ' ')} ", end="")
-    if i % 100 == 99:
-        print("#")
-    else:
-        print("#", end="")
-
-    k = min(rt, ct)
-    pos_meteor = [(rt - t, ct - t) for t in range(k + 1)]
-
+ans3 = 0
+for rt, ct in targets:
     hits = []
-    for power in range(1, rt // 2 + 2):
-        for delay in range(2):
-            for r, c, f in [(ra, ca, 1), (rb, cb, 2), (rc, cc, 3)]:
-                hits.extend(simulate(r, c, f, power, delay, pos_meteor))
-
+    for rs, cs, ms in segments:
+        hit = calc_hit(rt, ct, rs, cs, ms)
+        if hit is not None:
+            hits += [hit]
     highest = max(h[1] for h in hits)
     hits_highest = [h for h in hits if h[1] == highest]
     ans3 += min(h[3] * h[4] for h in hits_highest)
 
-print()
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
