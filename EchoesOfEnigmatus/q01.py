@@ -55,10 +55,10 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 
 def eni3(n, exp, mod):
-    x, a, idx = 1, [], {}
+    x, a, idx = 1, [], [-1] * mod
     for i in range(exp):
         x = x * n % mod
-        if x in idx:
+        if idx[x] != -1:
             i = idx[x]
             q, r = divmod(exp - i, len(a) - i)
             return sum(a[:i]) + q * sum(a[i:]) + sum(a[i:i + r])
