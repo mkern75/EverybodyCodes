@@ -13,7 +13,7 @@ n_bolts = 0
 while ballons:
     bolt = bolts[n_bolts % 3]
     n_bolts += 1
-    while ballons.popleft() == bolt:
+    while ballons and ballons.popleft() == bolt:
         pass
 
 ans1 = n_bolts
