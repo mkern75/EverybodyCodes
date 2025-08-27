@@ -65,7 +65,7 @@ for i, sequence in enumerate(sequences):
 
 dp_min = [1 << 31] * (1 << n_slots)
 dp_max = [0] * (1 << n_slots)
-dp_min[0] = 0
+dp_min[0] = dp_max[0] = 0
 to_check = {0}
 for i, sequence in enumerate(sequences):
     to_check_new = set()
