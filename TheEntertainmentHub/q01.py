@@ -1,5 +1,13 @@
 from time import time
 
+# ********************************* part 1
+time_start = time()
+INPUT_FILE = "./TheEntertainmentHub/data/q01_p1.txt"
+blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
+
+machine = blocks[0]
+sequences = blocks[1]
+
 
 def play(start_slot, sequence, machine):
     h, w = len(machine), len(machine[0])
@@ -22,14 +30,6 @@ def play(start_slot, sequence, machine):
     final_slot = c // 2
     return max(0, 2 * (final_slot + 1) - (start_slot + 1))
 
-
-# ********************************* part 1
-time_start = time()
-INPUT_FILE = "./TheEntertainmentHub/data/q01_p1.txt"
-blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
-
-machine = blocks[0]
-sequences = blocks[1]
 
 ans1 = sum(play(start_slot, sequence, machine) for start_slot, sequence in enumerate(sequences))
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
