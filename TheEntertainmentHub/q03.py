@@ -15,7 +15,6 @@ class Die:
         self.pulse = seed
         self.roll_number = 1
 
-
     def roll(self):
         spin = self.roll_number * self.pulse
         self.face_idx += spin
@@ -77,55 +76,54 @@ INPUT_FILE = "./TheEntertainmentHub/data/q03_p3.txt"
 blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
 
 
-def ff(r, c, d, i):
-    return (r << 48) | (c << 32) | (d << 16) | i
+def ff(r, c, i):
+    return r | (c << 10) | (i << 20)
 
 
-def fr(mask):
-    return mask >> 48, (mask >> 32) & 0xFFFF, (mask >> 16) & 0xFFFF, mask & 0xFFFF
+def fr(state):
+    return state & 0x3FF, (state >> 10) & 0x3FF, (state >> 20)
 
 
 dice = [Die.load_from_input(line) for line in blocks[0]]
-n_dice = len(dice)
 
 grid = [list(map(int, list(line))) for line in blocks[1]]
 n_rows, n_cols = len(grid), len(grid[0])
 coins = [[0] * n_cols for _ in range(n_rows)]
 
-rolls = [[] for _ in range(n_dice)]
-q = []
-seen = set()
-for r in range(n_rows):
-    for c in range(n_cols):
-        for d in range(n_dice):
-            mask = ff(r, c, d, 0)
-            q.append(mask)
-            seen.add(mask)
+for die in dice:
+    rolls = []
+    q = []
+    seen = set()
+    for r in range(n_rows):
+        for c in range(n_cols):
+            state = ff(r, c, 0)
+            q.append(state)
+            seen.add(state)
 
-while q:
-    r, c, d, i = fr(q.pop())
+    while q:
+        r, c, i = fr(q.pop())
 
-    if len(rolls[d]) == i:
-        rolls[d].append(dice[d].roll())
+        if len(rolls) == i:
+            rolls.append(die.roll())
 
-    if grid[r][c] != rolls[d][i]:
-        continue
+        if grid[r][c] != rolls[i]:
+            continue
 
-    coins[r][c] = 1
+        coins[r][c] = 1
 
-    masks = [ff(r, c, d, i + 1)]
-    if r - 1 >= 0:
-        masks.append(ff(r - 1, c, d, i + 1))
-    if r + 1 < n_rows:
-        masks.append(ff(r + 1, c, d, i + 1))
-    if c - 1 >= 0:
-        masks.append(ff(r, c - 1, d, i + 1))
-    if c + 1 < n_cols:
-        masks.append(ff(r, c + 1, d, i + 1))
-    for mask in masks:
-        if mask not in seen:
-            q.append(mask)
-            seen.add(mask)
+        states = [ff(r, c, i + 1)]
+        if r - 1 >= 0:
+            states.append(ff(r - 1, c, i + 1))
+        if r + 1 < n_rows:
+            states.append(ff(r + 1, c, i + 1))
+        if c - 1 >= 0:
+            states.append(ff(r, c - 1, i + 1))
+        if c + 1 < n_cols:
+            states.append(ff(r, c + 1, i + 1))
+        for state in states:
+            if state not in seen:
+                q.append(state)
+                seen.add(state)
 
 ans3 = sum(sum(row) for row in coins)
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
