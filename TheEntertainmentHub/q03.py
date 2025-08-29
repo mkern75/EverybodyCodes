@@ -10,23 +10,24 @@ class Die:
     def __init__(self, id, faces, seed):
         self.id = id
         self.faces = faces
+        self.face_idx = 0
         self.seed = seed
         self.pulse = seed
         self.roll_number = 1
-        self.face = 0
+
 
     def roll(self):
         spin = self.roll_number * self.pulse
-        self.face += spin
-        self.face %= len(self.faces)
+        self.face_idx += spin
+        self.face_idx %= len(self.faces)
         self.pulse += spin
         self.pulse %= self.seed
         self.pulse += 1 + self.roll_number + self.seed
         self.roll_number += 1
-        return self.faces[self.face]
+        return self.faces[self.face_idx]
 
     @classmethod
-    def load_from_line(cls, line):
+    def load_from_input(cls, line):
         n, f, s = line.split(" ")
         id = int(n[:-1])
         faces = list(map(int, f[7:-1].split(",")))
@@ -34,7 +35,7 @@ class Die:
         return Die(id, faces, seed)
 
 
-dice = [Die.load_from_line(line) for line in data]
+dice = [Die.load_from_input(line) for line in data]
 
 target = 10_000
 actual = 0
@@ -53,7 +54,7 @@ time_start = time()
 INPUT_FILE = "./TheEntertainmentHub/data/q03_p2.txt"
 blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
 
-dice = [Die.load_from_line(line) for line in blocks[0]]
+dice = [Die.load_from_input(line) for line in blocks[0]]
 n_dice = len(dice)
 
 racetrack = list(map(int, list(blocks[1][0])))
@@ -84,7 +85,7 @@ def fr(mask):
     return mask >> 48, (mask >> 32) & 0xFFFF, (mask >> 16) & 0xFFFF, mask & 0xFFFF
 
 
-dice = [Die.load_from_line(line) for line in blocks[0]]
+dice = [Die.load_from_input(line) for line in blocks[0]]
 n_dice = len(dice)
 
 grid = [list(map(int, list(line))) for line in blocks[1]]
