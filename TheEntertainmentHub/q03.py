@@ -75,15 +75,6 @@ time_start = time()
 INPUT_FILE = "./TheEntertainmentHub/data/q03_p3.txt"
 blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
 
-
-def ff(r, c):
-    return (r << 16) | c
-
-
-def fr(mask):
-    return (mask >> 16) & 0xFFFF, mask & 0xFFFF
-
-
 dice = [Die.load_from_input(line) for line in blocks[0]]
 grid = [list(map(int, list(line))) for line in blocks[1]]
 n_rows, n_cols = len(grid), len(grid[0])
@@ -91,29 +82,29 @@ n_rows, n_cols = len(grid), len(grid[0])
 coins = [[0] * n_cols for _ in range(n_rows)]
 
 for die in dice:
-    todo = {ff(r, c) for r in range(n_rows) for c in range(n_cols)}
+    todo = {r * n_cols + c for r in range(n_rows) for c in range(n_cols)}
 
     while todo:
         todo_next = set()
         roll = die.roll()
 
-        for state in todo:
-            r, c = fr(state)
+        for s in todo:
+            r, c = divmod(s, n_cols)
 
             if grid[r][c] != roll:
                 continue
 
             coins[r][c] = 1
 
-            todo_next.add(ff(r, c))
+            todo_next.add(r * n_cols + c)
             if r - 1 >= 0:
-                todo_next.add(ff(r - 1, c))
+                todo_next.add((r - 1) * n_cols + c)
             if r + 1 < n_rows:
-                todo_next.add(ff(r + 1, c))
+                todo_next.add((r + 1) * n_cols + c)
             if c - 1 >= 0:
-                todo_next.add(ff(r, c - 1))
+                todo_next.add(r * n_cols + (c - 1))
             if c + 1 < n_cols:
-                todo_next.add(ff(r, c + 1))
+                todo_next.add(r * n_cols + (c + 1))
 
         todo = todo_next
 
