@@ -78,11 +78,11 @@ blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n
 dice = [Die.load_from_input(line) for line in blocks[0]]
 grid = [list(map(int, list(line))) for line in blocks[1]]
 n_rows, n_cols = len(grid), len(grid[0])
-
 coins = [[0] * n_cols for _ in range(n_rows)]
+todo_start = {r * n_cols + c for r in range(n_rows) for c in range(n_cols)}
 
 for die in dice:
-    todo = {r * n_cols + c for r in range(n_rows) for c in range(n_cols)}
+    todo = todo_start
 
     while todo:
         todo_next = set()
@@ -90,10 +90,8 @@ for die in dice:
 
         for s in todo:
             r, c = divmod(s, n_cols)
-
             if grid[r][c] != roll:
                 continue
-
             coins[r][c] = 1
 
             todo_next.add(r * n_cols + c)
