@@ -57,8 +57,9 @@ INPUT_FILE = "./TheEntertainmentHub/data/q02_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 repeats = 100_000
-ballons = list(data[0]) * repeats
-n_ballons = len(ballons)
+ballon_seq = list(data[0])
+n_ballons_seq = len(ballon_seq)
+n_ballons = n_ballons_seq * repeats
 popped = [False] * n_ballons
 
 bolts = "RGB"
@@ -70,7 +71,7 @@ while n_ballons > 0:
     n_bolts += 1
     while popped[i]:
         i += 1
-    if ballons[i] == bolt and n_ballons & 1 == 0:
+    if ballon_seq[i % n_ballons_seq] == bolt and n_ballons & 1 == 0:
         popped[i] = True
         popped[-n_ballons // 2] = True
         n_ballons -= 2
