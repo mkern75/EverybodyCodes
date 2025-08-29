@@ -76,12 +76,12 @@ INPUT_FILE = "./TheEntertainmentHub/data/q03_p3.txt"
 blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
 
 
-def ff(r, c, i):
-    return r | (c << 10) | (i << 20)
+def ff(r, c):
+    return (r << 16) | c
 
 
 def fr(mask):
-    return mask & 0x3FF, (mask >> 10) & 0x3FF, (mask >> 20)
+    return (mask >> 16) & 0xFFFF, mask & 0xFFFF
 
 
 dice = [Die.load_from_input(line) for line in blocks[0]]
@@ -91,39 +91,31 @@ n_rows, n_cols = len(grid), len(grid[0])
 coins = [[0] * n_cols for _ in range(n_rows)]
 
 for die in dice:
-    rolls = []
-    q = []
-    seen = set()
-    for r in range(n_rows):
-        for c in range(n_cols):
-            state = ff(r, c, 0)
-            q.append(state)
-            seen.add(state)
+    todo = {ff(r, c) for r in range(n_rows) for c in range(n_cols)}
 
-    while q:
-        r, c, i = fr(q.pop())
+    while todo:
+        todo_next = set()
+        roll = die.roll()
 
-        if len(rolls) == i:
-            rolls.append(die.roll())
+        for state in todo:
+            r, c = fr(state)
 
-        if grid[r][c] != rolls[i]:
-            continue
+            if grid[r][c] != roll:
+                continue
 
-        coins[r][c] = 1
+            coins[r][c] = 1
 
-        states = [ff(r, c, i + 1)]
-        if r - 1 >= 0:
-            states.append(ff(r - 1, c, i + 1))
-        if r + 1 < n_rows:
-            states.append(ff(r + 1, c, i + 1))
-        if c - 1 >= 0:
-            states.append(ff(r, c - 1, i + 1))
-        if c + 1 < n_cols:
-            states.append(ff(r, c + 1, i + 1))
-        for state in states:
-            if state not in seen:
-                q.append(state)
-                seen.add(state)
+            todo_next.add(ff(r, c))
+            if r - 1 >= 0:
+                todo_next.add(ff(r - 1, c))
+            if r + 1 < n_rows:
+                todo_next.add(ff(r + 1, c))
+            if c - 1 >= 0:
+                todo_next.add(ff(r, c - 1))
+            if c + 1 < n_cols:
+                todo_next.add(ff(r, c + 1))
+
+        todo = todo_next
 
 ans3 = sum(sum(row) for row in coins)
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
