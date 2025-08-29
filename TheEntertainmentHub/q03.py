@@ -80,14 +80,14 @@ def ff(r, c, i):
     return r | (c << 10) | (i << 20)
 
 
-def fr(state):
-    return state & 0x3FF, (state >> 10) & 0x3FF, (state >> 20)
+def fr(mask):
+    return mask & 0x3FF, (mask >> 10) & 0x3FF, (mask >> 20)
 
 
 dice = [Die.load_from_input(line) for line in blocks[0]]
-
 grid = [list(map(int, list(line))) for line in blocks[1]]
 n_rows, n_cols = len(grid), len(grid[0])
+
 coins = [[0] * n_cols for _ in range(n_rows)]
 
 for die in dice:
