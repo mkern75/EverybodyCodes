@@ -25,6 +25,5 @@ INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q03_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 nums = list(map(int, data[0].split(",")))
-cnt = Counter(nums)
-ans3 = cnt.most_common(1)[0][1]
+ans3 = Counter(nums).most_common(1)[0][1]
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
