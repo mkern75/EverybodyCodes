@@ -40,12 +40,12 @@ def engrave(a, b, sz):
         x = a[0] + (b[0] - a[0]) * r // (sz - 1)
         for c in range(sz):
             y = a[1] + (b[1] - a[1]) * c // (sz - 1)
-            z = [x, y]
-            r = [0, 0]
+            z = (x, y)
+            r = (0, 0)
             ok = True
             for _ in range(100):
                 r = multiply(r, r)
-                r = divide(r, [100_000, 100_000])
+                r = divide(r, (100_000, 100_000))
                 r = add(r, z)
                 if not (-1000000 <= r[0] <= 1000000) or not (-1000000 <= r[1] <= 1000000):
                     ok = False
