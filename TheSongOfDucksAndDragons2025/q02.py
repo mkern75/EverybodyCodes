@@ -19,7 +19,7 @@ def divide(u, v):
     return x, y
 
 
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q02_p1.txt"
+INPUT_FILE = "./data/q02_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 a = tuple(map(int, data[0][3:-1].split(",")))
@@ -55,7 +55,7 @@ def engrave(a, b, sz):
     return res
 
 
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q02_p2.txt"
+INPUT_FILE = "./data/q02_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 a = tuple(map(int, data[0][3:-1].split(",")))
@@ -65,7 +65,7 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q02_p3.txt"
+INPUT_FILE = "./data/q02_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 a = tuple(map(int, data[0][3:-1].split(",")))

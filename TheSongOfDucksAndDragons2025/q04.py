@@ -3,7 +3,7 @@ from math import trunc, ceil, prod
 
 # ********************************* part 1
 time_start = time()
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q04_p1.txt"
+INPUT_FILE = "./data/q04_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 rotations = 2025
@@ -13,7 +13,7 @@ print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
 time_start = time()
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q04_p2.txt"
+INPUT_FILE = "./data/q04_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 target = 10000000000000
@@ -23,7 +23,7 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
-INPUT_FILE = "./TheSongOfDucksAndDragons2025/data/q04_p3.txt"
+INPUT_FILE = "./data/q04_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 rotations = 100
