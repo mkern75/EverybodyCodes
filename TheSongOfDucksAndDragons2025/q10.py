@@ -77,11 +77,24 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
+
+
+def get_safe_positions(n_rows: int, n_cols, hides):
+    safe = set()
+    for r in range(n_rows - 1, -1, -1):
+        for c in range(n_cols):
+            if (r, c) in hides:
+                if r == n_rows - 1 or (r + 1, c) in safe:
+                    safe.add((r, c))
+    return safe
+
+
 INPUT_FILE = "./data/q10_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 n_rows, n_cols, dragon, sheep, hides = load_board(data)
 dragon_moves = calc_dragon_moves(n_rows, n_cols)
+safe = get_safe_positions(n_rows, n_cols, hides)
 
 
 @cache
@@ -95,6 +108,8 @@ def solve(dragon: tuple[int, int], n_sheep: int, sheep_rows: tuple, turn: int = 
             if sheep_rows[c] == -1:
                 continue
             if sheep_rows[c] + 1 >= n_rows:
+                can_escape = True
+            elif (sheep_rows[c] + 1, c) in safe:
                 can_escape = True
             elif (sheep_rows[c] + 1, c) != dragon or (sheep_rows[c] + 1, c) in hides:
                 has_move = True
