@@ -57,7 +57,7 @@ n = len(nums)
 target = sum(nums) // n
 
 assert n >= 2
-assert all(nums[i] < nums[i + 1] for i in range(n - 1))
+assert all(nums[i] <= nums[i + 1] for i in range(n - 1))
 
 sum_left, count_left = nums[0], 1
 sum_right, count_right = nums[-1], 1

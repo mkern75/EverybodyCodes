@@ -52,7 +52,7 @@ INPUT_FILE = "./data/q11_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 nums = [int(line) for line in data]
 
-assert all(nums[i] < nums[i + 1] for i in range(len(nums) - 1))
+assert all(nums[i] <= nums[i + 1] for i in range(len(nums) - 1))
 target = sum(nums) // len(nums)
 lower = sum(target - x for x in nums if x < target)
 higher = sum(x - target for x in nums if x > target)
