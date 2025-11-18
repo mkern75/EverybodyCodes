@@ -10,9 +10,9 @@ def simulate(arr, max_cycle=1 << 63):
     while cycle < max_cycle:
         change = False
         for i in range(len(arr) - 1):
-            if nums[i] > nums[i + 1]:
-                nums[i] -= 1
-                nums[i + 1] += 1
+            if arr[i] > arr[i + 1]:
+                arr[i] -= 1
+                arr[i + 1] += 1
                 change = True
         if not change:
             break
@@ -20,9 +20,9 @@ def simulate(arr, max_cycle=1 << 63):
     while cycle < max_cycle:
         change = False
         for i in range(len(arr) - 1):
-            if nums[i] < nums[i + 1]:
-                nums[i] += 1
-                nums[i + 1] -= 1
+            if arr[i] < arr[i + 1]:
+                arr[i] += 1
+                arr[i + 1] -= 1
                 change = True
         if not change:
             break
