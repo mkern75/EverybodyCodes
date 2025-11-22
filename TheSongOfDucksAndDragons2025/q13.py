@@ -10,7 +10,6 @@ turns = 2025
 wheel = [1] + [0] * len(data)
 for i, line in enumerate(data):
     x = int(line)
-    
     if i & 1:
         wheel[-(i // 2 + 1)] = x
     else:
