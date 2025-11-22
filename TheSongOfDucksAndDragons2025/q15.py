@@ -7,31 +7,25 @@ time_start = time()
 
 
 def build_wall(instr):
-    x_start, y_start = 0, 0
-    dx, dy = 0, 1
-    wall = {(x_start, y_start)}
-    x, y = x_start, y_start
-    for d, n in instr:
-        if d == "L":
-            dx, dy = -dy, dx
-        else:
-            dx, dy = dy, -dx
-        for _ in range(n):
+    x, y, dx, dy = 0, 0, 0, 1
+    wall = {(x, y)}
+    for direct, amount in instr:
+        dx, dy = (-dy, dx) if direct == "L" else (dy, -dx)
+        for _ in range(amount):
             x += dx
             y += dy
             wall.add((x, y))
-    x_end, y_end = x, y
-    return x_start, y_start, x_end, y_end, wall
+    return (0, 0), (x, y), wall
 
 
-def calc_dist(x_start, y_start, x_end, y_end, wall):
+def calc_dist(start, end, wall):
     dist = defaultdict(lambda: 1 << 63)
-    dist[x_start, y_start] = 0
-    todo = [(x_start, y_start)]
-    for x, y in todo:
+    dist[start] = 0
+    todo = [start]
+    for (x, y) in todo:
         d = dist[x, y]
         for xn, yn in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]:
-            if (xn, yn) == (x_end, y_end):
+            if (xn, yn) == end:
                 return dist[x, y] + 1
             elif (xn, yn) not in wall:
                 if d + 1 < dist[xn, yn]:
@@ -44,8 +38,8 @@ INPUT_FILE = "./data/q15_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
-x_start, y_start, x_end, y_end, wall = build_wall(instr)
-ans1 = calc_dist(x_start, y_start, x_end, y_end, wall)
+start, end, wall = build_wall(instr)
+ans1 = calc_dist(start, end, wall)
 
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
@@ -56,8 +50,8 @@ INPUT_FILE = "./data/q15_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
-x_start, y_start, x_end, y_end, wall = build_wall(instr)
-ans2 = calc_dist(x_start, y_start, x_end, y_end, wall)
+start, end, wall = build_wall(instr)
+ans2 = calc_dist(start, end, wall)
 
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
@@ -88,46 +82,64 @@ class CoordinateCompression:
 
 
 def build_wall_segments(instr):
-    x_start, y_start = 0, 0
-    dx, dy = 0, 1
+    x, y, dx, dy = 0, 0, 0, 1
     wall_segments = []
-    x, y = x_start, y_start
-    for d, n in instr:
-        if d == "L":
-            dx, dy = -dy, dx
-        else:
-            dx, dy = dy, -dx
-        xn = x + n * dx
-        yn = y + n * dy
+    for direct, amount in instr:
+        dx, dy = (-dy, dx) if direct == "L" else (dy, -dx)
+        xn, yn = x + amount * dx, y + amount * dy
         wall_segments.append((x, y, xn, yn))
         x, y = xn, yn
-    x_end, y_end = x, y
-    return x_start, y_start, x_end, y_end, wall_segments
+    return (0, 0), (x, y), wall_segments
 
 
-def calc_dist3(x_start, y_start, x_end, y_end, wall, compression_x, compression_y):
-    x_min = compression_x.compressed_value(min(compression_x._orig_vals))
-    x_max = compression_x.compressed_value(max(compression_x._orig_vals))
-    y_min = compression_x.compressed_value(min(compression_x._orig_vals))
-    y_max = compression_x.compressed_value(max(compression_x._orig_vals))
+def init_compression(wall_segments):
+    x_values, y_values = set(), set()
+    for x1, y1, x2, y2 in wall_segments:
+        x_values.update([x1 - 1, x1, x1 + 1, x2 - 1, x2, x2 + 1])
+        y_values.update([y1 - 1, y1, y1 + 1, y2 - 1, y2, y2 + 1])
+    return CoordinateCompression(x_values), CoordinateCompression(y_values)
+
+
+def compress(start, end, wall_segments, compression):
+    start = (compression[0].compressed_value(start[0]), compression[1].compressed_value(start[1]))
+    end = (compression[0].compressed_value(end[0]), compression[1].compressed_value(end[1]))
+    wall = set()
+    for x1, y1, x2, y2 in wall_segments:
+        x1 = compression[0].compressed_value(x1)
+        y1 = compression[1].compressed_value(y1)
+        x2 = compression[0].compressed_value(x2)
+        y2 = compression[1].compressed_value(y2)
+        if x1 == x2:
+            for y in range(min(y1, y2), max(y1, y2) + 1):
+                wall.add((x1, y))
+        else:
+            for x in range(min(x1, x2), max(x1, x2) + 1):
+                wall.add((x, y1))
+    return start, end, wall
+
+
+def calc_dist3(start, end, wall, compression):
+    x_min, x_max = 0, compression[0].n_compressed_values() - 1
+    y_min, y_max = 0, compression[1].n_compressed_values() - 1
     dist = defaultdict(lambda: 1 << 63)
-    dist[x_start, y_start] = 0
-    pq = [(0, x_start, y_start)]
+    dist[start] = 0
+    pq = [(0, start)]
     while pq:
-        d, x, y = heappop(pq)
+        d, (x, y) = heappop(pq)
         if d != dist[x, y]:
             continue
-        if (x, y) == (x_end, y_end):
+        if (x, y) == end:
             return d
         for xn, yn in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]:
             if xn < x_min or xn > x_max or yn < y_min or yn > y_max:
                 continue
-            dx = abs(compression_x.original_value(x) - compression_x.original_value(xn))
-            dy = abs(compression_y.original_value(y) - compression_y.original_value(yn))
-            if (xn, yn) == (x_end, y_end) or (xn, yn) not in wall:
-                if d + dx + dy < dist[xn, yn]:
-                    dist[xn, yn] = d + dx + dy
-                    heappush(pq, (d + dx + dy, xn, yn))
+            dx = abs(compression[0].original_value(x) - compression[0].original_value(xn))
+            dy = abs(compression[1].original_value(y) - compression[1].original_value(yn))
+            dn = d + dx + dy
+            if (xn, yn) == end or (xn, yn) not in wall:
+                if dn < dist[xn, yn]:
+                    dist[xn, yn] = dn
+                    heappush(pq, (dn, (xn, yn)))
     assert False
 
 
@@ -135,30 +147,9 @@ INPUT_FILE = "./data/q15_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
-x_start, y_start, x_end, y_end, wall_segments = build_wall_segments(instr)
+start, end, wall_segments = build_wall_segments(instr)
+compression = init_compression(wall_segments)
+start, end, wall = compress(start, end, wall_segments, compression)
+ans3 = calc_dist3(start, end, wall, compression)
 
-x_values, y_values = [], []
-for x1, y1, x2, y2 in wall_segments:
-    x_values.extend([x1 - 1, x1, x1 + 1, x2 - 1, x2, x2 + 1])
-    y_values.extend([y1 - 1, y1, y1 + 1, y2 - 1, y2, y2 + 1])
-
-compression_x = CoordinateCompression(x_values)
-compression_y = CoordinateCompression(y_values)
-
-x_start_comp = compression_x.compressed_value(x_start)
-x_end_comp = compression_x.compressed_value(x_end)
-y_start_comp = compression_y.compressed_value(y_start)
-y_end_comp = compression_y.compressed_value(y_end)
-
-wall_comp = set()
-for x1, y1, x2, y2 in wall_segments:
-    x1_comp = compression_x.compressed_value(x1)
-    y1_comp = compression_y.compressed_value(y1)
-    x2_comp = compression_x.compressed_value(x2)
-    y2_comp = compression_y.compressed_value(y2)
-    for x_comp in range(min(x1_comp, x2_comp), max(x1_comp, x2_comp) + 1):
-        for y_comp in range(min(y1_comp, y2_comp), max(y1_comp, y2_comp) + 1):
-            wall_comp.add((x_comp, y_comp))
-
-ans3 = calc_dist3(x_start_comp, y_start_comp, x_end_comp, y_end_comp, wall_comp, compression_x, compression_y)
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
