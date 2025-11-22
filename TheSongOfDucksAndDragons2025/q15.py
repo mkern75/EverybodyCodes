@@ -51,6 +51,7 @@ print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
 time_start = time()
+
 INPUT_FILE = "./data/q15_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
@@ -131,7 +132,6 @@ def calc_dist3(x_start, y_start, x_end, y_end, wall, compression_x, compression_
 
 
 INPUT_FILE = "./data/q15_p3.txt"
-# INPUT_FILE = "./data/q15_p3_test.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
