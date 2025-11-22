@@ -44,8 +44,8 @@ INPUT_FILE = "./data/q15_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
-x_start, y_start, x_end, y_end, wall_comp = build_wall(instr)
-ans1 = calc_dist(x_start, y_start, x_end, y_end, wall_comp)
+x_start, y_start, x_end, y_end, wall = build_wall(instr)
+ans1 = calc_dist(x_start, y_start, x_end, y_end, wall)
 
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
@@ -56,8 +56,8 @@ INPUT_FILE = "./data/q15_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 instr = [(x[0], int(x[1:])) for x in data[0].split(",")]
-x_start, y_start, x_end, y_end, wall_comp = build_wall(instr)
-ans2 = calc_dist(x_start, y_start, x_end, y_end, wall_comp)
+x_start, y_start, x_end, y_end, wall = build_wall(instr)
+ans2 = calc_dist(x_start, y_start, x_end, y_end, wall)
 
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
