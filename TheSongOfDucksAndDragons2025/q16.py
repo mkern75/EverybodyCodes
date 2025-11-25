@@ -21,7 +21,7 @@ cols = list(map(int, data[0].split(",")))
 n_cols = len(cols)
 spell = []
 for i in range(n_cols):
-    if cols[i] > 0:
+    while cols[i]:
         spell += [i + 1]
         for j in range(i, n_cols, i + 1):
             cols[j] -= 1
@@ -38,7 +38,7 @@ cols = list(map(int, data[0].split(",")))
 n_cols = len(cols)
 spell = []
 for i in range(n_cols):
-    if cols[i] > 0:
+    while cols[i]:
         spell += [i + 1]
         for j in range(i, n_cols, i + 1):
             cols[j] -= 1
