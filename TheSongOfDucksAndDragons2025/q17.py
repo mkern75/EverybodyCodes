@@ -54,14 +54,12 @@ stop = False
 while not stop:
     stop = True
     radius += 1
-    res = 0
+    destruction.append(0)
     for r in range(n_rows):
         for c in range(n_cols):
-            if grid[r][c] > 0 and within_radius(r, c, rv, cv, radius):
-                res += grid[r][c]
-                grid[r][c] = 0
+            if within_radius(r, c, rv, cv, radius) and not within_radius(r, c, rv, cv, radius - 1):
+                destruction[-1] += grid[r][c]
                 stop = False
-    destruction.append(res)
 ans2 = max(destruction) * destruction.index(max(destruction))
 
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
