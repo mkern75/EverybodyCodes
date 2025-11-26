@@ -66,59 +66,46 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
-
-
-def encode(r, c, z):
-    return r * 2 * n_cols + c * 2 + z
-
-
-def decode(i):
-    z = i & 1
-    r, c = divmod(i >> 1, n_cols)
-    return r, c, z
-
-
-def calc_best_loop(radius):
-    if within_radius(rs, cs, rv, cv, radius):
-        return None
-    threshold = (radius + 1) * 30
-    start = encode(rs, cs, 0)
-    end = encode(rs, cs, 1)
-    dist = [INF] * (n_rows * n_cols * 2)
-    dist[start] = 0
-    pq = [(0, start)]
-    while pq:
-        d, pos = heappop(pq)
-        if d > dist[pos]:
-            continue
-        if pos == end:
-            return d
-        r, c, z = decode(pos)
-        for rn, cn, zn in [(r + 1, c, z), (r - 1, c, z), (r, c + 1, z), (r, c - 1, z)]:
-            if rn < 0 or n_rows <= rn or cn < 0 or n_cols <= cn:
-                continue
-            if within_radius(rn, cn, rv, cv, radius):
-                continue
-            if r > rv and (c == cv and cn == c + 1 or cn == cv and c == cn + 1):
-                zn = 1 - zn
-            posn = encode(rn, cn, zn)
-            dn = d + grid[rn][cn]
-            if dn < threshold and dn < dist[posn]:
-                dist[posn] = dn
-                heappush(pq, (dn, posn))
-    return None
-
-
 INPUT_FILE = "./data/q17_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 n_rows, n_cols, grid, rv, cv, rs, cs = load_grid(data)
 
-ans3 = None
-radius = 0
-while not ans3:
-    radius += 1
-    if d := calc_best_loop(radius):
-        ans3 = radius * d
+
+def calc_dist(radius_destroyed, left):
+    dist = [[INF] * n_cols for _ in range(n_rows)]
+    if within_radius(rs, cs, rv, cv, radius_destroyed):
+        return dist
+    dist[rs][cs] = 0
+    pq = [(0, rs, cs)]
+    while pq:
+        d, r, c = heappop(pq)
+        if d > dist[r][c]:
+            continue
+        for rn, cn in [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]:
+            if rn < 0 or n_rows <= rn or cn < 0 or n_cols <= cn:
+                continue
+            if rn == rv and ((left and cn >= cv) or (not left and cn <= cv)):
+                continue
+            if within_radius(rn, cn, rv, cv, radius_destroyed):
+                continue
+            dn = d + grid[rn][cn]
+            if dn < dist[rn][cn]:
+                dist[rn][cn] = dn
+                heappush(pq, (dn, rn, cn))
+    return dist
+
+
+radius_destroyed = 0
+while True:
+    radius_destroyed += 1
+    dist_left = calc_dist(radius_destroyed, True)
+    dist_right = calc_dist(radius_destroyed, False)
+    best = INF
+    for r in range(rv + 1, n_rows):
+        best = min(best, dist_left[r][cv] + dist_right[r][cv] - grid[r][cv])
+    if best < (radius_destroyed + 1) * 30:
+        ans3 = best * radius_destroyed
+        break
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
