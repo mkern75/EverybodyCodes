@@ -23,16 +23,15 @@ def load_plant_data(blocks):
 
 
 def simulate(n_plants, thickness, adj, activation=None):
-    incoming_energy = [0] * n_plants
     plant_energy = [0] * n_plants
     for plant_id in range(n_plants):
         if not adj[plant_id]:
-            incoming_energy[plant_id] = 1 if activation is None else activation[plant_id]
+            incoming_energy = 1 if activation is None else activation[plant_id]
         else:
-            incoming_energy[plant_id] = sum(
+            incoming_energy = sum(
                 branch_thickness * plant_energy[branch_id] for branch_id, branch_thickness in adj[plant_id])
-        if incoming_energy[plant_id] >= thickness[plant_id]:
-            plant_energy[plant_id] = incoming_energy[plant_id]
+        if incoming_energy >= thickness[plant_id]:
+            plant_energy[plant_id] = incoming_energy
     return plant_energy[-1]
 
 
