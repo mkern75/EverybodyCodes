@@ -25,17 +25,14 @@ def load_plant_data(blocks):
 def simulate(n_plants, thickness, adj, activation=None):
     incoming_energy = [0] * n_plants
     plant_energy = [0] * n_plants
-    for i in range(n_plants):
-        if not adj[i]:
-            if activation is None:
-                incoming_energy[i] = 1
-            else:
-                incoming_energy[i] = activation[i]
+    for plant_id in range(n_plants):
+        if not adj[plant_id]:
+            incoming_energy[plant_id] = 1 if activation is None else activation[plant_id]
         else:
-            for branch_id, branch_thickness in adj[i]:
-                incoming_energy[i] += branch_thickness * plant_energy[branch_id]
-        if incoming_energy[i] >= thickness[i]:
-            plant_energy[i] = incoming_energy[i]
+            incoming_energy[plant_id] = sum(
+                branch_thickness * plant_energy[branch_id] for branch_id, branch_thickness in adj[plant_id])
+        if incoming_energy[plant_id] >= thickness[plant_id]:
+            plant_energy[plant_id] = incoming_energy[plant_id]
     return plant_energy[-1]
 
 
@@ -53,10 +50,7 @@ time_start = time()
 
 
 def load_activation_data(block):
-    act = []
-    for line in block[1:]:
-        act.append(list(map(int, line.split())))
-    return act
+    return [list(map(int, line.split())) for line in block[1:]]
 
 
 INPUT_FILE = "./data/q18_p2.txt"
@@ -88,7 +82,7 @@ for plant_id in range(n_inputs, n_plants):
         if branch_id < n_inputs:
             if branch_thickness > 0:
                 pos[branch_id] = 1
-            elif branch_thickness <0:
+            elif branch_thickness < 0:
                 neg[branch_id] = 1
 
 # this is NOT true for the simple example
