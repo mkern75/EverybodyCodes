@@ -53,7 +53,7 @@ time_start = time()
 
 
 def load_activation_data(block):
-    return [list(map(int, line.split())) for line in block[1:]]
+    return [extract_all_numbers(line) for line in block if line]
 
 
 INPUT_FILE = "./data/q18_p2.txt"
