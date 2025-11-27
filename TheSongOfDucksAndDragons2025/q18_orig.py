@@ -5,23 +5,19 @@ import re
 time_start = time()
 
 
-def extract_all_numbers(s: str) -> list[int]:
-    return list(map(int, re.findall(r"-?\d+", s)))
-
-
 def load_plant_data(blocks):
     n_plants = len(blocks)
     thickness = [0] * n_plants
     adj = [[] for _ in range(n_plants)]
     for block in blocks:
-        nums = extract_all_numbers(block[0])
-        plant_id = nums[0] - 1
-        thickness[plant_id] = nums[1]
+        x = re.match(r"Plant (\d+) with thickness (\d+):", block[0])
+        plant_id = int(x.groups()[0]) - 1
+        thickness[plant_id] = int(x.groups()[1])
         for line in block[1:]:
-            nums = extract_all_numbers(line)
-            if len(nums) == 2:
-                branch_id = nums[0] - 1
-                branch_thickness = nums[1]
+            if "free" not in line:
+                x = re.match(r"- branch to Plant (\d+) with thickness (-?\d+)", line)
+                branch_id = int(x.groups()[0]) - 1
+                branch_thickness = int(x.groups()[1])
                 adj[plant_id].append((branch_id, branch_thickness))
     return n_plants, thickness, adj
 
@@ -77,6 +73,8 @@ activation = load_activation_data(blocks[-1])
 assert all(branch_id < plant_id for plant_id in range(n_plants) for branch_id, _ in adj[plant_id])
 
 n_inputs = sum(1 for plant_id in range(n_plants) if not adj[plant_id])
+assert all(not adj[plant_id] for plant_id in range(n_inputs))
+
 pos, neg = [0] * n_inputs, [0] * n_inputs
 for plant_id in range(n_inputs, n_plants):
     for branch_id, branch_thickness in adj[plant_id]:
