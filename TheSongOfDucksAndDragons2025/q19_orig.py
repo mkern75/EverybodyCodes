@@ -11,7 +11,7 @@ def load_gaps(data):
     gaps = defaultdict(list)
     for line in data:
         x, y, sz = map(int, line.split(","))
-        gaps[x].append((y, y + sz + 1))
+        gaps[x].append((y, y + sz - 1))
     return gaps
 
 
