@@ -15,28 +15,37 @@ def load_gaps(data):
     return gaps
 
 
-def is_reachable(x1, y1, x2, y2):
+def calc_dist(x1, y1, x2, y2):
     assert x1 < x2
-    assert abs(x2 - x1) & 1 == abs(y2 - y1) & 1
-    return abs(y2 - y1) <= x2 - x1
+    dx = x2 - x1
+    dy = y2 - y1
+    assert dx & 1 == dy & 1
+    if abs(dy) > abs(dx):
+        return INF
+    res = 0
+    if dy > 0:
+        res += dy
+    dx -= abs(dy)
+    res += dx // 2
+    return res
 
 
 def solve(gaps):
-    x_prev = 0
-    reachable_prev = {0}
+    dist = defaultdict(lambda: INF)
+    dist[0, 0] = 0
     for x in sorted(gaps.keys()):
-        reachable = set()
+        dist_next = defaultdict(lambda: INF)
         for y1, y2 in gaps[x]:
             for y in range(y1, y2 + 1):
                 if (x + y) & 1:
                     continue
-                for y_prev in reachable_prev:
-                    if is_reachable(x_prev, y_prev, x, y):
-                        reachable.add(y)
+                for (x_from, y_from), d in dist.items():
+                    d_extra = calc_dist(x_from, y_from, x, y)
+                    if d_extra != INF:
+                        dist_next[x, y] = dist[x_from, y_from] + d_extra
                         break
-        x_prev, reachable_prev = x, reachable
-    x_sol, y_sol = x_prev, min(reachable_prev)
-    return y_sol + (x_sol - y_sol) // 2
+        dist = dist_next
+    return min(dist.values())
 
 
 INPUT_FILE = "./data/q19_p1.txt"
@@ -57,6 +66,7 @@ gaps = load_gaps(data)
 ans2 = solve(gaps)
 
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
+
 
 # ********************************* part 3
 time_start = time()
