@@ -9,32 +9,39 @@ def load_gaps(data):
     gaps = defaultdict(list)
     for line in data:
         x, y, sz = map(int, line.split(","))
-        gaps[x].append((y, y + sz - 1))
+        gaps[x].append([y, y + sz - 1])
+    for lst in gaps.values():
+        lst.sort()
     return gaps
 
 
-def is_reachable(x1, y1, x2, y2):
+def intersect(x1, y1_low, y1_high, x2, y2_low, y2_high):
     assert x1 < x2
-    assert abs(x2 - x1) & 1 == abs(y2 - y1) & 1
-    return abs(y2 - y1) <= x2 - x1
+    dx = x2 - x1
+    y3_low = y1_low - dx
+    y3_high = y1_high + dx
+    y_low = max(y2_low, y3_low)
+    y_low += (x2 + y_low) & 1
+    y_high = min(y2_high, y3_high)
+    y_high -= (x2 + y_high) & 1
+    return (y_low, y_high) if y_low <= y_high else (-1, -1)
 
 
 def solve(gaps):
-    x_prev = 0
-    reachable_prev = {0}
-    for x in sorted(gaps.keys()):
-        reachable = set()
-        for y1, y2 in gaps[x]:
-            for y in range(y1, y2 + 1):
-                if (x + y) & 1:
-                    continue
-                for y_prev in reachable_prev:
-                    if is_reachable(x_prev, y_prev, x, y):
-                        reachable.add(y)
-                        break
-        x_prev, reachable_prev = x, reachable
-    x_sol, y_sol = x_prev, min(reachable_prev)
-    return y_sol + (x_sol - y_sol) // 2
+    x = 0
+    y_reachable = [[0, 0]]
+    for x_next in sorted(gaps.keys()):
+        y_reachable_next = []
+        for y_low, y_high in y_reachable:
+            for y_next_gap_low, y_next_gap_high in gaps[x_next]:
+                y_next_low, y_next_high = intersect(x, y_low, y_high, x_next, y_next_gap_low, y_next_gap_high)
+                if y_next_low != -1:
+                    if y_reachable_next and y_next_low <= y_reachable_next[-1][1]:
+                        y_reachable_next[-1][1] = y_next_high
+                    else:
+                        y_reachable_next.append([y_next_low, y_next_high])
+        x, y_reachable = x_next, y_reachable_next
+    return y_reachable[0][0] + (x - y_reachable[0][0]) // 2
 
 
 INPUT_FILE = "./data/q19_p1.txt"
