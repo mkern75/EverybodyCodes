@@ -1,8 +1,6 @@
 from time import time
 from collections import defaultdict
 
-INF = 1 << 31
-
 # ********************************* part 1
 time_start = time()
 
