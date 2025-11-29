@@ -6,8 +6,14 @@ INF = 1 << 31
 # ********************************* part 1
 time_start = time()
 
+INPUT_FILE = "./data/q20_p1.txt"
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-def neighbours(r, c, n_rows, n_cols):
+grid = [list(line) for line in data]
+n_rows, n_cols = len(grid), len(grid[0])
+
+
+def neighbours(r, c):
     if (r + c) & 1 == 1:
         candidates = [(r, c - 1), (r, c + 1), (r + 1, c)]
     else:
@@ -19,63 +25,59 @@ def neighbours(r, c, n_rows, n_cols):
     return res
 
 
-INPUT_FILE = "./data/q20_p1.txt"
-data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+def count_trampoline_pairs():
+    res = 0
+    for r in range(n_rows):
+        for c in range(n_cols - 1):
+            if grid[r][c] == "T":
+                for rn, cn in neighbours(r, c):
+                    if (r, c) < (rn, cn) and grid[rn][cn] == "T":
+                        res += 1
+    return res
 
-grid = [list(line) for line in data]
-n_rows, n_cols = len(grid), len(grid[0])
 
-ans1 = 0
-for r in range(n_rows):
-    for c in range(n_cols - 1):
-        if grid[r][c] == "T":
-            for rn, cn in neighbours(r, c, n_rows, n_cols):
-                if grid[rn][cn] == "T":
-                    ans1 += 1
-ans1 //= 2
-
+ans1 = count_trampoline_pairs()
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 1
 time_start = time()
-
-
-def find_start(grid):
-    for r, row in enumerate(grid):
-        for c, char in enumerate(row):
-            if char == "S":
-                return r, c
-    assert False
-
 
 INPUT_FILE = "./data/q20_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 grid = [list(line) for line in data]
 n_rows, n_cols = len(grid), len(grid[0])
-rs, cs = find_start(grid)
+rs, cs = next((r, c) for r in range(n_rows) for c in range(n_cols) if grid[r][c] == "S")
 
-ans2 = INF
-dist = defaultdict(lambda: INF)
-dist[rs, cs] = 0
-bfs = [(rs, cs)]
-for r, c in bfs:
-    if grid[r][c] == "E":
-        ans2 = dist[r, c]
-        break
-    for rn, cn in neighbours(r, c, n_rows, n_cols):
-        if grid[rn][cn] in "TSE" and dist[rn, cn] == INF:
-            dist[rn, cn] = dist[r, c] + 1
-            bfs.append((rn, cn))
 
+def bfs(start):
+    dist = defaultdict(lambda: INF, {start: 0})
+    todo = [start]
+    for r, c in todo:
+        if grid[r][c] == "E":
+            return dist[r, c]
+        for rn, cn in neighbours(r, c):
+            if grid[rn][cn] in "TSE" and dist[rn, cn] == INF:
+                dist[rn, cn] = dist[r, c] + 1
+                todo.append((rn, cn))
+    return INF
+
+
+ans2 = bfs((rs, cs))
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
 
+INPUT_FILE = "./data/q20_p3.txt"
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+
+grid = [list(line) for line in data]
+n_rows, n_cols = len(grid), len(grid[0])
+rs, cs = next((r, c) for r in range(n_rows) for c in range(n_cols) if grid[r][c] == "S")
+
 
 def rotate(grid):
-    n_rows, n_cols = len(grid), len(grid[0])
     grid_new = [["." for _ in range(n_cols)] for _ in range(n_rows)]
     for c in range(0, n_cols, 2):
         rn = c // 2
@@ -90,7 +92,10 @@ def rotate(grid):
     return grid_new
 
 
-def neighbours_part3(r, c, s, n_rows, n_cols):
+grids = [grid, rotate(grid), rotate(rotate(grid))]
+
+
+def neighbours3(r, c, s):
     if (r + c) & 1 == 1:
         candidates = [(r, c), (r, c - 1), (r, c + 1), (r + 1, c)]
     else:
@@ -102,25 +107,18 @@ def neighbours_part3(r, c, s, n_rows, n_cols):
     return res
 
 
-INPUT_FILE = "./data/q20_p3.txt"
-data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+def bfs3(start):
+    dist = defaultdict(lambda: INF, {start: 0})
+    todo = [start]
+    for r, c, s in todo:
+        if grids[s][r][c] == "E":
+            return dist[r, c, s]
+        for rn, cn, sn in neighbours3(r, c, s):
+            if grids[sn][rn][cn] in "TSE" and dist[rn, cn, sn] == INF:
+                dist[rn, cn, sn] = dist[r, c, s] + 1
+                todo.append((rn, cn, sn))
+    return INF
 
-grid = [list(line) for line in data]
-n_rows, n_cols = len(grid), len(grid[0])
-rs, cs = find_start(grid)
-grids = [grid, rotate(grid), rotate(rotate(grid))]
 
-ans3 = INF
-dist = defaultdict(lambda: INF)
-dist[rs, cs, 0] = 0
-bfs = [(rs, cs, 0)]
-for r, c, s in bfs:
-    if grids[s][r][c] == "E":
-        ans3 = dist[r, c, s]
-        break
-    for rn, cn, sn in neighbours_part3(r, c, s, n_rows, n_cols):
-        if grids[sn][rn][cn] in "TSE" and dist[rn, cn, sn] == INF:
-            dist[rn, cn, sn] = dist[r, c, s] + 1
-            bfs.append((rn, cn, sn))
-
+ans3 = bfs3((rs, cs, 0))
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
