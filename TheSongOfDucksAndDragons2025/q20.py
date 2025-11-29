@@ -40,10 +40,10 @@ print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 time_start = time()
 
 
-def find_pos(ch, grid):
+def find_start(grid):
     for r, row in enumerate(grid):
         for c, char in enumerate(row):
-            if char == ch:
+            if char == "S":
                 return r, c
     assert False
 
@@ -53,7 +53,7 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 grid = [list(line) for line in data]
 n_rows, n_cols = len(grid), len(grid[0])
-rs, cs = find_pos("S", grid)
+rs, cs = find_start(grid)
 
 ans2 = INF
 dist = defaultdict(lambda: INF)
@@ -107,7 +107,7 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 grid = [list(line) for line in data]
 n_rows, n_cols = len(grid), len(grid[0])
-rs, cs = find_pos("S", grid)
+rs, cs = find_start(grid)
 grids = [grid, rotate(grid), rotate(rotate(grid))]
 
 ans3 = INF
