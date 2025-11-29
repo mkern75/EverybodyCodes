@@ -4,6 +4,10 @@ import re
 UTILS_TIME = time.time()
 
 
+def extract_all_numbers(s: str) -> list[int]:
+    return list(map(int, re.findall(r"-?\d+", s)))
+
+
 def tic():
     global UTILS_TIME
     UTILS_TIME = time.time()

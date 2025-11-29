@@ -1,9 +1,15 @@
 from time import time
+import re
+
+
+def extract_all_numbers(s: str) -> list[int]:
+    return list(map(int, re.findall(r"-?\d+", s)))
+
 
 # ********************************* part 1
 time_start = time()
-INPUT_FILE = "./data/q1x_p1.txt"
-# INPUT_FILE = "./data/q1x_p1_test.txt"
+# INPUT_FILE = "./data/q1x_p1.txt"
+INPUT_FILE = "./data/q1x_p1_test.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 # blocks = [block.splitlines() for block in open(INPUT_FILE, "r").read().split("\n\n")]
 ans1 = 0
