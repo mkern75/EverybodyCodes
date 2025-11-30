@@ -96,15 +96,7 @@ grids = [grid, rotate(grid), rotate(rotate(grid))]
 
 
 def neighbours3(r, c, s):
-    if (r + c) & 1 == 1:
-        candidates = [(r, c), (r, c - 1), (r, c + 1), (r + 1, c)]
-    else:
-        candidates = [(r, c), (r, c - 1), (r, c + 1), (r - 1, c)]
-    res = []
-    for rn, cn in candidates:
-        if 0 <= rn < n_rows and rn <= cn <= n_cols - 1 - rn:
-            res.append((rn, cn, (s + 1) % 3))
-    return res
+    return [(rn, cn, (s + 1) % 3) for rn, cn in ([(r, c)] + neighbours(r, c))]
 
 
 def bfs3(start):
