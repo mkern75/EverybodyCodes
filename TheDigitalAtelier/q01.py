@@ -25,9 +25,8 @@ def calc1(jumps):
     return x
 
 
-ans1 = 0
-for line in data:
-    ans1 += calc1(nums(line))
+ans1 = sum(calc1(nums(line)) for line in data)
+
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
@@ -50,9 +49,8 @@ def calc2(jumps):
     return x
 
 
-ans2 = 0
-for line in data:
-    ans2 += calc2(nums(line))
+ans2 = sum(calc2(nums(line)) for line in data)
+
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
@@ -112,7 +110,6 @@ def calc3(jumps):
     return x
 
 
-ans3 = 0
-for line in data:
-    ans3 += calc3(nums(line))
+ans3 = sum(calc3(nums(line)) for line in data)
+
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
