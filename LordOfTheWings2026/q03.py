@@ -7,15 +7,16 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 
 def calc(a: str, b: str) -> int:
-    res = 0
-    ka = len(a)
-    kb = len(b)
-    for i in range(kb):
-        x = int(a[(ka - 1 - i) % ka])
-        y = int(b[kb - 1 - i])
-        e = i
-        res += y * x ** e
-    return res
+    a, b = a[::-1], b[::-1]
+    return sum(int(b[i]) * int(a[i % len(a)]) ** i for i in range(len(b)))
+
+
+def valid(a, b):
+    v = calc(a, b)
+    for i in range(int(b)):
+        if calc(a, str(i)) == v:
+            return False
+    return True
 
 
 ans1 = 0
@@ -41,15 +42,6 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 time_start = time()
 INPUT_FILE = "./data/q03_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
-
-
-def valid(a, b):
-    v = calc(a, b)
-    for i in range(int(b)):
-        if calc(a, str(i)) == v:
-            return False
-    return True
-
 
 ans3 = 0
 for line in data:
