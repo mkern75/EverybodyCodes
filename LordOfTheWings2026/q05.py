@@ -1,5 +1,10 @@
 from time import time
 
+# ********************************* part 1
+time_start = time()
+INPUT_FILE = "./data/q05_p1.txt"
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+
 
 def neighbours(r, c, R, C):
     for dr, dc in [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]:
@@ -14,12 +19,6 @@ def count_neightbours(r, c, grid, target):
 
 def count_grid(grid, target):
     return sum(1 for row in grid for x in row if x in target)
-
-
-# ********************************* part 1
-time_start = time()
-INPUT_FILE = "./data/q05_p1.txt"
-data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 
 def find_land(grid):
@@ -130,15 +129,17 @@ def run_growth_step(grid):
         for c in range(C):
             if check_tree_growth(r, c, grid):
                 grid_new[r][c] = "@"
-    return grid_new
+    for r in range(R):
+        for c in range(C):
+            grid[r][c] = grid_new[r][c]
 
 
 grid = [list(line) for line in data]
 find_land(grid)
 find_sand(grid)
 find_initial_trees(grid)
-grid = run_growth_step(grid)
-grid = run_growth_step(grid)
+run_growth_step(grid)
+run_growth_step(grid)
 ans3 = count_grid(grid, "@")
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
