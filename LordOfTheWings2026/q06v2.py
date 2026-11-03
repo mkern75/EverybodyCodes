@@ -3,14 +3,11 @@ from collections import defaultdict
 
 
 def reachable(v, graph):
-    res = set()
-    todo = [v]
+    res, todo = set(), [v]
     while todo:
         v = todo.pop()
-        if v in res:
-            continue
-        res.add(v)
-        if v in graph:
+        if v not in res:
+            res.add(v)
             todo.extend(graph[v])
     return res
 
