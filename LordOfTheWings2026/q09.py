@@ -50,11 +50,7 @@ time_start = time()
 INPUT_FILE = "./data/q09_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans1 = 0
-for line in data:
-    growth, limit = parse(line)
-    ans1 += simulate1(growth, limit)
-
+ans1 = sum(simulate1(*parse(line)) for line in data)
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
@@ -62,11 +58,7 @@ time_start = time()
 INPUT_FILE = "./data/q09_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans2 = 0
-for line in data:
-    growth, limit = parse(line)
-    ans2 += simulate2(growth, limit)
-
+ans2 = sum(simulate2(*parse(line)) for line in data)
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
@@ -74,9 +66,5 @@ time_start = time()
 INPUT_FILE = "./data/q09_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans3 = 0
-for line in data:
-    growth, limit = parse(line)
-    ans3 += simulate2(growth, limit)
-
+ans3 = sum(simulate2(*parse(line)) for line in data)
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
