@@ -12,7 +12,7 @@ def parse(data):
     return n, shortcuts
 
 
-def calc_distance(n, edges, start):
+def bfs(n, edges, start):
     dist = [INF] * n
     dist[start] = 0
     todo = [start]
@@ -28,29 +28,28 @@ def solve(n, k, shortcuts):
     edges = [[] for _ in range(n)]
     for u in range(n):
         for i in range(1, k + 1):
-            edges[u].append((u - i) % n)
-            edges[u].append((u + i) % n)
-    res1 = n * sum(calc_distance(n, edges, 0))
+            edges[u].extend([(u - i) % n, (u + i) % n])
+    res1 = n * sum(bfs(n, edges, 0))
 
     for u, v in shortcuts:
         edges[u].append(v)
         edges[v].append(u)
-    res2 = sum(sum(calc_distance(n, edges, start)) for start in range(n))
+    res2 = sum(sum(bfs(n, edges, start)) for start in range(n))
 
     return res1 - res2
 
 
-def calc_all_portal_options(crystals):
+def calc_portal_options(crystals):
     res = []
-    all_pairs_helper([], crystals, res)
+    helper([], crystals, res)
     return res
 
 
-def all_pairs_helper(so_far, remaining, res):
+def helper(so_far, remaining, res):
     if not remaining:
         res.append(so_far)
     for i in range(1, len(remaining)):
-        all_pairs_helper(so_far + [(remaining[0], remaining[i])], remaining[1:i] + remaining[i + 1:], res)
+        helper(so_far + [(remaining[0], remaining[i])], remaining[1:i] + remaining[i + 1:], res)
 
 
 # ********************************* part 1
@@ -84,8 +83,8 @@ data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 n, shortcuts = parse(data)
 ans3 = 0
 for i in range(n // 8):
-    crystals = [i + j * (n // 8) for j in range(8)]
-    for extra_portals in calc_all_portal_options(crystals):
+    crystals = list(range(i, n, n//8))
+    for extra_portals in calc_portal_options(crystals):
         ans3 = max(ans3, solve(n, 3, shortcuts + extra_portals))
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
