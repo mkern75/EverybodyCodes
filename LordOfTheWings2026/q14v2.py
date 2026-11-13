@@ -13,7 +13,7 @@ def parse(data):
     return grid, len(data), len(data[0])
 
 
-def build_adj(grid, R, C):
+def adjacency(grid, R, C):
     adj = defaultdict(Counter)
     for r in range(R):
         for c in range(C):
@@ -43,32 +43,14 @@ def prim(adj, portals=frozenset()):
     return res
 
 
-def solve1(grid, R, C):
-    adj = build_adj(grid, R, C)
-    return sum(sum(cnt.values()) for cnt in adj.values()) // 2
-
-
-def solve2(grid, R, C):
-    adj = build_adj(grid, R, C)
-    return prim(adj)
-
-
-def solve3(grid, R, C):
-    adj = build_adj(grid, R, C)
-    portal = sorted({grid[r, c] for r in range(R) for c in range(C)})
-    res = 1 << 31
-    for i in range(len(portal) - 1):
-        for j in range(i + 1, len(portal)):
-            res = min(res, prim(adj, frozenset({portal[i], portal[j]})))
-    return res
-
-
 # ********************************* part 1
 time_start = time()
 INPUT_FILE = "./data/q14_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans1 = solve1(*parse(data))
+grid, R, C = parse(data)
+adj = adjacency(grid, R, C)
+ans1 = sum(sum(cnt.values()) for cnt in adj.values()) // 2
 
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
@@ -77,7 +59,9 @@ time_start = time()
 INPUT_FILE = "./data/q14_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans2 = solve2(*parse(data))
+grid, R, C = parse(data)
+adj = adjacency(grid, R, C)
+ans2 = prim(adj)
 
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
@@ -86,6 +70,12 @@ time_start = time()
 INPUT_FILE = "./data/q14_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans3 = solve3(*parse(data))
+grid, R, C = parse(data)
+adj = adjacency(grid, R, C)
+portal = sorted({grid[r, c] for r in range(R) for c in range(C)})
+ans3 = 1 << 31
+for i in range(len(portal) - 1):
+    for j in range(i + 1, len(portal)):
+        ans3 = min(ans3, prim(adj, frozenset({portal[i], portal[j]})))
 
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")
