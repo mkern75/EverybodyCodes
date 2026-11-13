@@ -2,33 +2,7 @@ from time import time
 from collections import Counter, defaultdict
 from heapq import heappop, heappush
 
-INF = RIM = 1 << 31
-
-
-class DSU:
-    def __init__(self, n: int):
-        self._parent = list(range(n))
-
-    def find(self, x: int) -> int:
-        parent = self._parent
-        y = x
-        while x != parent[x]:
-            x = parent[x]
-        while y != x:
-            parent[y], y = x, parent[y]
-        return x
-
-    def unite(self, x: int, y: int) -> bool:
-        x = self.find(x)
-        y = self.find(y)
-        if x == y:
-            return False
-        self._parent[y] = x
-        return True
-
-
-def idx(r, c, C):
-    return r * C + c
+RIM = "rim"
 
 
 def neighbours(r, c, R, C):
@@ -37,54 +11,30 @@ def neighbours(r, c, R, C):
             yield rn, cn
 
 
-def build_dsu(grid, R, C):
-    dsu = DSU(R * C)
-    for r in range(R):
-        for c in range(C):
-            for rn, cn in neighbours(r, c, R, C):
-                if grid[r][c] == grid[rn][cn]:
-                    dsu.unite(idx(r, c, C), idx(rn, cn, C))
-    return dsu
-
-
-def solve1(grid):
-    R, C = len(grid), len(grid[0])
-    dsu = build_dsu(grid, R, C)
-
-    res = 2 * (R + C)  # rim
-    for r in range(R):
-        for c in range(C):
-            for rn, cn in neighbours(r, c, R, C):
-                if dsu.find(idx(r, c, C)) < dsu.find(idx(rn, cn, C)):
-                    res += 1
-    return res
-
-
-def build_adj(dsu, R, C):
+def build_adj(grid):
     adj = defaultdict(Counter)
+    R, C = len(grid), len(grid[0])
     # inside
     for r in range(R):
         for c in range(C):
-            x = dsu.find(idx(r, c, C))
             for rn, cn in neighbours(r, c, R, C):
-                y = dsu.find(idx(rn, cn, C))
-                if x != y:
-                    adj[x][y] += 1
+                if grid[r][c] != grid[rn][cn]:
+                    adj[grid[r][c]][grid[rn][cn]] += 1
     # rim
     for r in range(R):
-        adj[RIM][dsu.find(idx(r, 0, C))] += 1
-        adj[dsu.find(idx(r, 0, C))][RIM] += 1
-        adj[RIM][dsu.find(idx(r, C - 1, C))] += 1
-        adj[dsu.find(idx(r, C - 1, C))][RIM] += 1
+        adj[RIM][grid[r][0]] += 1
+        adj[grid[r][0]][RIM] += 1
+        adj[RIM][grid[r][C - 1]] += 1
+        adj[grid[r][C - 1]][RIM] += 1
     for c in range(C):
-        adj[RIM][dsu.find(idx(0, c, C))] += 1
-        adj[dsu.find(idx(0, c, C))][RIM] += 1
-        adj[RIM][dsu.find(idx(R - 1, c, C))] += 1
-        adj[dsu.find(idx(R - 1, c, C))][RIM] += 1
+        adj[RIM][grid[0][c]] += 1
+        adj[grid[0][c]][RIM] += 1
+        adj[RIM][grid[R - 1][c]] += 1
+        adj[grid[R - 1][c]][RIM] += 1
     return adj
 
 
-def prim(adj, portals):
+def prim(adj, portals=frozenset()):
     res = 0
     covered = {RIM}
     pq = []
@@ -102,23 +52,23 @@ def prim(adj, portals):
     return res
 
 
+def solve1(grid):
+    adj = build_adj(grid)
+    return sum(sum(cnt.values()) for cnt in adj.values()) // 2
+
+
 def solve2(grid):
-    R, C = len(grid), len(grid[0])
-    dsu = build_dsu(grid, R, C)
-    adj = build_adj(dsu, R, C)
-    return prim(adj, set())
+    adj = build_adj(grid)
+    return prim(adj)
 
 
 def solve3(grid):
-    R, C = len(grid), len(grid[0])
-    dsu = build_dsu(grid, R, C)
-    adj = build_adj(dsu, R, C)
-
-    res = INF
-    portal = sorted({dsu.find(idx(r, c, C)) for r in range(R) for c in range(C)})
+    adj = build_adj(grid)
+    portal = sorted({char for row in grid for char in row})
+    res = 1 << 31
     for i in range(len(portal) - 1):
         for j in range(i + 1, len(portal)):
-            res = min(res, prim(adj, {portal[i], portal[j]}))
+            res = min(res, prim(adj, frozenset({portal[i], portal[j]})))
     return res
 
 
