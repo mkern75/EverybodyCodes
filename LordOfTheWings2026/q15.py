@@ -76,7 +76,7 @@ def solve3(grid):
         seen = {(rr, cc, RIGHT)}
         for r, c, d, cnt, t in todo:
             if r == rs and c == cc and cnt > 0:
-                if cnt < best[cnt]:
+                if t < best[cnt]:
                     best[cnt] = t
                 continue
             for rn, cn, dn in moves(r, c, d):
@@ -85,7 +85,6 @@ def solve3(grid):
                     if (rn, cn, dn) not in seen:
                         seen.add((rn, cn, dn))
                         todo.append((rn, cn, dn, cntn, t + 1))
-
     sulphur_cycle, time_cycle = min([(k, v) for k, v in best.items()], key=lambda x: x[1] / x[0])
 
     target = 202620262026
