@@ -88,7 +88,7 @@ def solve3(grid):
     sulphur_cycle, time_cycle = min([(k, v) for k, v in best.items()], key=lambda x: x[1] / x[0])
 
     target = 202620262026
-    f = max(0, target // sulphur_cycle - 3)
+    f = max(0, target // sulphur_cycle - 10)
     return f * time_cycle + solve2(grid, target - f * sulphur_cycle, True)
 
 
