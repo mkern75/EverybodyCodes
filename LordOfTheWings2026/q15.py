@@ -50,13 +50,14 @@ def solve1(grid):
     return -1
 
 
-def solve2(grid):
+def solve2(grid, target=2026, exact=False):
     R, C, rs, cs, re, ce, sulphur = parse(grid)
     todo = [(rs, cs, RIGHT, 0, 0)]
     seen = {(rs, cs, RIGHT, 0)}
     for r, c, d, cnt, t in todo:
-        if r == re and c == ce and cnt >= 2026:
-            return t
+        if r == re and c == ce:
+            if (exact and cnt == target) or (not exact and cnt >= target):
+                return t
         for rn, cn, dn in moves(r, c, d):
             if 0 <= rn < R and 0 <= cn < C and grid[rn][cn] != "#":
                 cntn = cnt + 1 if grid[rn][cn] == "@" else cnt
@@ -66,7 +67,7 @@ def solve2(grid):
     return -1
 
 
-def find_best_cycles(grid):
+def solve3(grid):
     R, C, rs, cs, re, ce, sulphur = parse(grid)
     best = defaultdict(lambda: INF)
     rr = rs
@@ -84,29 +85,12 @@ def find_best_cycles(grid):
                     if (rn, cn, dn) not in seen:
                         seen.add((rn, cn, dn))
                         todo.append((rn, cn, dn, cntn, t + 1))
-    return min([(k, v) for k, v in best.items()], key=lambda x: x[1] / x[0])
 
+    sulphur_cycle, time_cycle = min([(k, v) for k, v in best.items()], key=lambda x: x[1] / x[0])
 
-def solve3(grid):
     target = 202620262026
-    sulphur_cycle, time_cycle = find_best_cycles(grid)
     f = max(0, target // sulphur_cycle - 3)
-    res = f * time_cycle
-    target -= f * sulphur_cycle
-
-    R, C, rs, cs, re, ce, sulphur = parse(grid)
-    todo = [(rs, cs, RIGHT, 0, 0)]
-    seen = {(rs, cs, RIGHT, 0)}
-    for r, c, d, cnt, t in todo:
-        if r == re and c == ce and cnt == target:
-            return res + t
-        for rn, cn, dn in moves(r, c, d):
-            if 0 <= rn < R and 0 <= cn < C and grid[rn][cn] != "#":
-                cntn = cnt + 1 if grid[rn][cn] == "@" else cnt
-                if (rn, cn, dn, cntn) not in seen:
-                    seen.add((rn, cn, dn, cntn))
-                    todo.append((rn, cn, dn, cntn, t + 1))
-    return -1
+    return f * time_cycle + solve2(grid, target - f * sulphur_cycle, True)
 
 
 # ********************************* part 1
