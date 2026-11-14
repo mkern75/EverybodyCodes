@@ -1,6 +1,5 @@
 from time import time
 
-INF = 1 << 63
 UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
 
 
