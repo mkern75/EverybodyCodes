@@ -90,7 +90,7 @@ def find_best_cycles(grid):
 def solve3(grid):
     target = 202620262026
     sulphur_cycle, time_cycle = find_best_cycles(grid)
-    f = max(0,target // sulphur_cycle - 3)
+    f = max(0, target // sulphur_cycle - 3)
     res = f * time_cycle
     target -= f * sulphur_cycle
 
@@ -130,7 +130,6 @@ print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 # ********************************* part 3
 time_start = time()
 INPUT_FILE = "./data/q15_p3.txt"
-# INPUT_FILE = "./data/q15_p3_test.txt"
 grid = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 ans3 = solve3(grid)
