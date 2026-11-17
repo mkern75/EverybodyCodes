@@ -5,7 +5,7 @@ def parse_segments(s: str, repeats: int = 1):
     segments = []
     for _ in range(repeats):
         for i, char in enumerate(s):
-            if i == 0 or char != s[i - 1]:
+            if not segments or char != segments[-1][0]:
                 segments.append([char, 1])
             else:
                 segments[-1][-1] += 1
