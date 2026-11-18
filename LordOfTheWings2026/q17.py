@@ -1,7 +1,7 @@
 from time import time
 from collections import defaultdict
 
-UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
+TOP, RIGHT, BOTTOM, LEFT = 0, 1, 2, 3
 
 
 def parse(data):
@@ -20,15 +20,18 @@ def neighbours(r, c):
 
 
 def neighbours2(r, c, d):
-    if d == UP:
-        res = [(r, c - 1, UP), (r, c + 1, UP), (r, c, LEFT), (r, c, RIGHT), (r - 1, c - 1, RIGHT), (r - 1, c + 1, LEFT)]
-    elif d == DOWN:
-        res = [(r, c - 1, DOWN), (r, c + 1, DOWN), (r, c, LEFT), (r, c, RIGHT), (r + 1, c - 1, RIGHT),
+    if d == TOP:
+        res = [(r, c - 1, TOP), (r, c + 1, TOP), (r, c, LEFT), (r, c, RIGHT), (r - 1, c - 1, RIGHT),
+               (r - 1, c + 1, LEFT)]
+    elif d == BOTTOM:
+        res = [(r, c - 1, BOTTOM), (r, c + 1, BOTTOM), (r, c, LEFT), (r, c, RIGHT), (r + 1, c - 1, RIGHT),
                (r + 1, c + 1, LEFT)]
     elif d == RIGHT:
-        res = [(r - 1, c, RIGHT), (r + 1, c, RIGHT), (r, c, UP), (r, c, DOWN), (r - 1, c + 1, DOWN), (r + 1, c + 1, UP)]
+        res = [(r - 1, c, RIGHT), (r + 1, c, RIGHT), (r, c, TOP), (r, c, BOTTOM), (r - 1, c + 1, BOTTOM),
+               (r + 1, c + 1, TOP)]
     elif d == LEFT:
-        res = [(r - 1, c, LEFT), (r + 1, c, LEFT), (r, c, UP), (r, c, DOWN), (r - 1, c - 1, DOWN), (r + 1, c - 1, UP)]
+        res = [(r - 1, c, LEFT), (r + 1, c, LEFT), (r, c, TOP), (r, c, BOTTOM), (r - 1, c - 1, BOTTOM),
+               (r + 1, c - 1, TOP)]
     else:
         assert False
     for rn, cn, dn in res:
@@ -68,19 +71,19 @@ def solve3(R, C, grid):
     for r in range(R):
         for c in range(C):
             if grid[r, c] == "#":
-                for rn, cn, d in [(r - 1, c, UP), (r + 1, c, DOWN), (r, c - 1, LEFT), (r, c + 1, RIGHT)]:
+                for rn, cn, d in [(r - 1, c, TOP), (r + 1, c, BOTTOM), (r, c - 1, LEFT), (r, c + 1, RIGHT)]:
                     if grid[rn, cn] == ".":
                         edges.add((r, c, d))
     n_edges = len(edges)
 
     # check path going down from start / arriving from left at the finish
     path = []
-    todo = {(0, 0, LEFT), (R - 1, C - 1, DOWN)}
+    todo = {(0, 0, LEFT), (R - 1, C - 1, BOTTOM)}
 
     # remove edges for start / finish
     edges.remove((0, 0, LEFT))
-    edges.remove((0, 0, UP))
-    edges.remove((R - 1, C - 1, DOWN))
+    edges.remove((0, 0, TOP))
+    edges.remove((R - 1, C - 1, BOTTOM))
     edges.remove((R - 1, C - 1, RIGHT))
 
     while todo:
