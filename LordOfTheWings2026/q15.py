@@ -1,93 +1,92 @@
 from time import time
-from collections import defaultdict
 
-INF = 1 << 63
 UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
 
 
-def parse(grid):
-    R, C = len(grid), len(grid[0])
-    rs, cs = -1, -1
-    re, ce = -1, -1
-    sulphur = {}
-    for r in range(R):
-        for c in range(C):
-            if grid[r][c] == "S":
-                rs, cs = r, c
-            if grid[r][c] == "E":
-                re, ce = r, c
-            if grid[r][c] == "@":
-                sulphur[r, c] = len(sulphur)
-    return R, C, rs, cs, re, ce, sulphur
+class Grid:
+    def __init__(self, data):
+        self._grid = [list(row) for row in data]
+        self.R = len(data)
+        self.C = len(data[0])
+        self.r_start = -1
+        self.c_start = -1
+        self.r_end = -1
+        self.c_end = -1
+        self.sulphur = {}
+        for r in range(self.R):
+            for c in range(self.C):
+                if self._grid[r][c] == "S":
+                    self.r_start, self.c_start = r, c
+                elif self._grid[r][c] == "E":
+                    self.r_end, self.c_end = r, c
+                elif self._grid[r][c] == "@":
+                    self.sulphur[r, c] = len(self.sulphur)
+
+    def __getitem__(self, key):
+        r, c = key
+        return self._grid[r][c]
+
+    def moves(self, row, column, direction):
+        assert direction in [UP, RIGHT, DOWN, LEFT]
+        if direction == UP:
+            mv = [(row - 1, column, UP), (row, column - 1, LEFT), (row, column + 1, RIGHT)]
+        elif direction == DOWN:
+            mv = [(row + 1, column, DOWN), (row, column - 1, LEFT), (row, column + 1, RIGHT)]
+        elif direction == LEFT:
+            mv = [(row, column - 1, LEFT), (row + 1, column, DOWN), (row - 1, column, UP)]
+        else:
+            mv = [(row, column + 1, RIGHT), (row + 1, column, DOWN), (row - 1, column, UP)]
+        for rn, cn, dn in mv:
+            if 0 <= rn < self.R and 0 <= cn < self.C and self[rn, cn] != "#":
+                yield rn, cn, dn
 
 
-def moves(r, c, d):
-    if d == UP:
-        return [(r - 1, c, UP), (r, c - 1, LEFT), (r, c + 1, RIGHT)]
-    elif d == DOWN:
-        return [(r + 1, c, DOWN), (r, c - 1, LEFT), (r, c + 1, RIGHT)]
-    elif d == LEFT:
-        return [(r, c - 1, LEFT), (r + 1, c, DOWN), (r - 1, c, UP)]
-    elif d == RIGHT:
-        return [(r, c + 1, RIGHT), (r + 1, c, DOWN), (r - 1, c, UP)]
-    else:
-        assert False
-
-
-def solve1(grid):
-    R, C, rs, cs, re, ce, sulphur = parse(grid)
-    todo = [(rs, cs, RIGHT, 0, 0)]
-    seen = {(rs, cs, RIGHT, 0)}
+def solve1(grid: Grid) -> int:
+    todo = [(grid.r_start, grid.c_start, RIGHT, 0, 0)]
+    seen = {(grid.r_start, grid.c_start, RIGHT, 0)}
     for r, c, d, msk, t in todo:
-        if r == re and c == ce and msk.bit_count() == len(sulphur):
+        if r == grid.r_end and c == grid.c_end and msk.bit_count() == len(grid.sulphur):
             return t
-        for rn, cn, dn in moves(r, c, d):
-            if 0 <= rn < R and 0 <= cn < C and grid[rn][cn] != "#":
-                mskn = msk | (1 << sulphur[rn, cn]) if grid[rn][cn] == "@" else msk
-                if (rn, cn, dn, mskn) not in seen:
-                    seen.add((rn, cn, dn, mskn))
-                    todo.append((rn, cn, dn, mskn, t + 1))
+        for rn, cn, dn in grid.moves(r, c, d):
+            mskn = msk | (1 << grid.sulphur[rn, cn]) if grid[rn, cn] == "@" else msk
+            if (rn, cn, dn, mskn) not in seen:
+                seen.add((rn, cn, dn, mskn))
+                todo.append((rn, cn, dn, mskn, t + 1))
     return -1
 
 
-def solve2(grid, target=2026, exact=False):
-    R, C, rs, cs, re, ce, sulphur = parse(grid)
-    todo = [(rs, cs, RIGHT, 0, 0)]
-    seen = {(rs, cs, RIGHT, 0)}
+def solve2(grid: Grid, target: int, exact_match: bool = False) -> int:
+    todo = [(grid.r_start, grid.c_start, RIGHT, 0, 0)]
+    seen = {(grid.r_start, grid.c_start, RIGHT, 0)}
     for r, c, d, cnt, t in todo:
-        if r == re and c == ce:
-            if (exact and cnt == target) or (not exact and cnt >= target):
+        if r == grid.r_end and c == grid.c_end and cnt >= target:
+            if cnt == target or not exact_match:
                 return t
-        for rn, cn, dn in moves(r, c, d):
-            if 0 <= rn < R and 0 <= cn < C and grid[rn][cn] != "#":
-                cntn = cnt + 1 if grid[rn][cn] == "@" else cnt
-                if (rn, cn, dn, cntn) not in seen:
-                    seen.add((rn, cn, dn, cntn))
-                    todo.append((rn, cn, dn, cntn, t + 1))
+        for rn, cn, dn in grid.moves(r, c, d):
+            cntn = cnt + 1 if grid[rn, cn] == "@" else cnt
+            if (rn, cn, dn, cntn) not in seen:
+                seen.add((rn, cn, dn, cntn))
+                todo.append((rn, cn, dn, cntn, t + 1))
     return -1
 
 
-def solve3(grid):
-    R, C, rs, cs, re, ce, sulphur = parse(grid)
-    best = defaultdict(lambda: INF)
-    rr = rs
-    for cc in range(cs + 1, ce):
+def solve3(grid: Grid, target: int) -> int:
+    sulphur_cycle, time_cycle = 1, 1 << 31
+    rr = grid.r_start
+    for cc in range(grid.c_start + 1, grid.c_end):
         todo = [(rr, cc, RIGHT, 0, 0)]
-        seen = {(rr, cc, RIGHT)}
+        seen = set()
         for r, c, d, cnt, t in todo:
-            if r == rs and c == cc and cnt > 0:
-                if t < best[cnt]:
-                    best[cnt] = t
+            if r == rr and c == cc and d != LEFT and cnt > 0:
+                if t * sulphur_cycle < time_cycle * cnt:
+                    sulphur_cycle, time_cycle = cnt, t
                 continue
-            for rn, cn, dn in moves(r, c, d):
-                if 0 <= rn < R and 0 <= cn < C and grid[rn][cn] != "#":
-                    cntn = cnt + 1 if grid[rn][cn] == "@" else cnt
-                    if (rn, cn, dn) not in seen:
-                        seen.add((rn, cn, dn))
-                        todo.append((rn, cn, dn, cntn, t + 1))
-    sulphur_cycle, time_cycle = min([(k, v) for k, v in best.items()], key=lambda x: x[1] / x[0])
+            for rn, cn, dn in grid.moves(r, c, d):
+                cntn = cnt + 1 if grid[rn, cn] == "@" else cnt
+                if (rn, cn, dn) not in seen:
+                    seen.add((rn, cn, dn))
+                    todo.append((rn, cn, dn, cntn, t + 1))
 
-    target = 202620262026
     f = max(0, target // sulphur_cycle - 10)
     return f * time_cycle + solve2(grid, target - f * sulphur_cycle, True)
 
@@ -95,26 +94,23 @@ def solve3(grid):
 # ********************************* part 1
 time_start = time()
 INPUT_FILE = "./data/q15_p1.txt"
-grid = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans1 = solve1(grid)
-
+ans1 = solve1(Grid(data))
 print(f"part 1: {ans1}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 2
 time_start = time()
 INPUT_FILE = "./data/q15_p2.txt"
-grid = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans2 = solve2(grid)
-
+ans2 = solve3(Grid(data), 2026)
 print(f"part 2: {ans2}  ({time() - time_start:.3f}s)")
 
 # ********************************* part 3
 time_start = time()
 INPUT_FILE = "./data/q15_p3.txt"
-grid = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
+data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
-ans3 = solve3(grid)
-
+ans3 = solve3(Grid(data), 202620262026)
 print(f"part 3: {ans3}  ({time() - time_start:.3f}s)")

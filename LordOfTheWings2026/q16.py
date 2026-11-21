@@ -1,68 +1,72 @@
 from time import time
 
 
-def parse_segments(s: str, repeats: int = 1):
-    segments = []
+def parse(s: str, repeats: int = 1):
+    letters, cnt = [], []
     for _ in range(repeats):
         for i, char in enumerate(s):
-            if not segments or char != segments[-1][0]:
-                segments.append([char, 1])
+            if not letters or char != letters[-1]:
+                letters.append(char)
+                cnt.append(1)
             else:
-                segments[-1][-1] += 1
-    return segments
+                cnt[-1] += 1
+    return letters, cnt
 
 
-def solve(segments):
-    if len(segments) <= 1:
-        return True, 0, 0, []
+def solve(letters, cnt):
+    if len(letters) <= 1:
+        return True, 0, 0, [], []
 
-    char = segments[0][0]
-    for i in range(len(segments) - 1, 0, -1):
-        if segments[i][0] == char:
+    char = letters[0]
+    for i in range(len(letters) - 1, 0, -1):
+        if letters[i] == char:
             last = i
             break
     else:
-        return False, 0, 0, segments[1:]
+        return False, 0, 0, letters[1:], cnt[1:]
 
     total_flips = 0
     total_flip_length = 0
     il = 1
     ir = last
-    segments_remaining = segments[ir + 1:][::-1]  # initially reversed
-    current_flip_length = sum(segments[i][1] for i in range(il, ir + 1))
+    letters_remaining = letters[ir + 1:][::-1]  # initially reversed so we can add to the end
+    cnt_remaining = cnt[ir + 1:][::-1]  # initially reversed so we can add to the end
+    current_flip_length = sum(cnt[i] for i in range(il, ir + 1))
 
     while il <= ir:
 
-        assert segments[ir][0] == char
+        assert letters[ir] == char
         total_flips += 1
         total_flip_length += current_flip_length
-        current_flip_length -= segments[ir][1]
+        current_flip_length -= cnt[ir]
         ir -= 1
-        while segments[il][0] != char:
-            current_flip_length -= segments[il][1]
-            if segments_remaining and segments[il][0] == segments_remaining[-1][0]:
-                segments_remaining[-1][1] += segments[il][1]
+        while letters[il] != char:
+            current_flip_length -= cnt[il]
+            if letters_remaining and letters[il] == letters_remaining[-1]:
+                cnt_remaining[-1] += cnt[il]
             else:
-                segments_remaining.append(segments[il])
+                letters_remaining.append(letters[il])
+                cnt_remaining.append(cnt[il])
             il += 1
 
         if il > ir:
             break
 
-        assert segments[il][0] == char
+        assert letters[il] == char
         total_flips += 1
         total_flip_length += current_flip_length
-        current_flip_length -= segments[il][1]
+        current_flip_length -= cnt[il]
         il += 1
-        while segments[ir][0] != char:
-            current_flip_length -= segments[ir][1]
-            if segments_remaining and segments[ir][0] == segments_remaining[-1][0]:
-                segments_remaining[-1][1] += segments[ir][1]
+        while letters[ir] != char:
+            current_flip_length -= cnt[ir]
+            if letters_remaining and letters[ir] == letters_remaining[-1]:
+                cnt_remaining[-1] += cnt[ir]
             else:
-                segments_remaining.append(segments[ir])
+                letters_remaining.append(letters[ir])
+                cnt_remaining.append(cnt[ir])
             ir -= 1
 
-    return False, total_flips, total_flip_length, segments_remaining[::-1]
+    return False, total_flips, total_flip_length, letters_remaining[::-1], cnt_remaining[::-1]
 
 
 # ********************************* part 1
@@ -71,9 +75,9 @@ INPUT_FILE = "./data/q16_p1.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 ans1 = 0
-shelf = parse_segments(data[0])
+letters, cnt = parse(data[0])
 while True:
-    finished, flips, _, shelf = solve(shelf)
+    finished, flips, _, letters, cnt = solve(letters, cnt)
     if finished:
         break
     ans1 += flips
@@ -86,9 +90,9 @@ INPUT_FILE = "./data/q16_p2.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 ans2 = 0
-shelf = parse_segments(data[0], 10)
+letters, cnt = parse(data[0], 10)
 while True:
-    finished, _, flip_length, shelf = solve(shelf)
+    finished, _, flip_length, letters, cnt = solve(letters, cnt)
     if finished:
         break
     ans2 += flip_length
@@ -101,9 +105,9 @@ INPUT_FILE = "./data/q16_p3.txt"
 data = [line.rstrip('\n') for line in open(INPUT_FILE, "r")]
 
 ans3 = 0
-shelf = parse_segments(data[0], 100)
+letters, cnt = parse(data[0], 100)
 while True:
-    finished, _, flip_length, shelf = solve(shelf)
+    finished, _, flip_length, letters, cnt = solve(letters, cnt)
     if finished:
         break
     ans3 += flip_length
